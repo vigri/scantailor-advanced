@@ -44,20 +44,36 @@ jobs:
         cpack -G "RPM"
         mv scantailor*.rpm scantailor.rpm
       
-    - name: Upload linux bin
+    - name: Upload Linux bin
       uses: actions/upload-artifact@v3
       with:
-        name: scantailor-linux-qt5
+        name: scantailor-linux-ubuntu-latest-qt5
         path: build/scantailor
         
-    - name: Upload linux DEB
+    - name: Upload Linux DEB
       uses: actions/upload-artifact@v3
       with:
-        name: scantailor-linux-qt5-deb
+        name: scantailor-linux-ubuntu-latest-qt5-deb
         path: build/scantailor.deb
         
-    - name: Upload linux RPM
+    - name: Upload Linux RPM
       uses: actions/upload-artifact@v3
       with:
-        name: scantailor-linux-qt5-rpm
+        name: scantailor-linux-ubuntu-latest-qt5-rpm
         path: build/scantailor.rpm
+        
+  build-windows-qt5:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: git mingw-w64-ucrt-x86_64-gcc
+      - name: CI-Build
+        run: |
+          ls
