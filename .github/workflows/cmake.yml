@@ -69,6 +69,8 @@ jobs:
         shell: msys2 {0}
     steps:
       - uses: actions/checkout@v3
+        with:
+          repository: vigri/scantailor-libs-build
       - uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
@@ -76,4 +78,8 @@ jobs:
           install: git mingw-w64-ucrt-x86_64-gcc
       - name: CI-Build
         run: |
-          ls
+          ./configure_msys.bat
+          ./configure_libs_x64.bat
+          mkdir build & cd build
+          cmake -G "MinGW Makefiles" --build ..
+          mingw64-make -j %NUMBER_OF_PROCESSORS%
