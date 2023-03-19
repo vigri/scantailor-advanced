@@ -75,7 +75,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-libjpeg-turbo mingw-w64-libpng mingw-w64-libtiff
+          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
       - name: CI-Build
         run: |
           ./configure_msys.bat
