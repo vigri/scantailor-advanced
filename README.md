@@ -76,7 +76,7 @@ For this reason I have created this fork. It contains:
 - Korean translation (PR in the original repository, credit goes to @brendan-t and @mirusu400)
 - Beside 'background' and white you can now choose black as filling color
 - 1200 DPI output option
-- Some other fixes and improvements...
+- Some other fixes and improvements ...
 
 PRs are highly welcome ;-)
 
