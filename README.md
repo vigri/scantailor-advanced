@@ -45,6 +45,7 @@ brings new ones and fixes.
     * [Auto adjusting content area](#auto-adjusting-content-area)
     * [Black on white detection](#black-on-white-detection)
     * [Guides](#guides)
+* [License](#license)
 
 ## Description
 
@@ -413,4 +414,4 @@ has't been moved due to dirty realization. Their functionality is fully covered 
 
 ## License
 
-This software is licensed under GNU GPLv3, you can read more about it on our [LICENSE](/LICENSE) file
+This software is licensed under GNU GPLv3, you can read more about it on our [LICENSE](/LICENSE) file.
