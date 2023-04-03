@@ -79,8 +79,6 @@ For this reason I have created this fork. It contains:
 
 PRs are highly welcome ;-)
 
-
-
 ## Features
 
 ### ScanTailor Enhanced
@@ -119,7 +117,7 @@ PRs are highly welcome ;-)
   This allows to expand and un-dock thumbnails view to see more thumbnails at a time.
   
   *This feature had performance and drawing issues and has been reworked.*
- 
+  
 ### ScanTailor Featured
 
 * #### ScanTailor Featured fixes & improvements
@@ -182,7 +180,7 @@ has't been moved due to dirty realization. Their functionality is fully covered 
     
   * Fixed some bugs of official and Enhanced version.
 
-### <a name="scantailor-advanced-features"></a> ScanTailor Advanced
+### ScanTailor Advanced
 
 * #### ScanTailor Advanced fixes & improvements
   * Portability.  
@@ -412,3 +410,7 @@ has't been moved due to dirty realization. Their functionality is fully covered 
       Hold **`Shift`** pressed to select vertical guides only or **`Ctrl`** for horizontal ones.
       Hold **`Shift+Ctrl`** to attach that to both the nearest vertical and horizontal guides.  
     * Use the **context menu** to enable/disable showing the hard margins rectangle.  
+
+## License
+
+This software is licensed under GNU GPLv3, you can read more about it on our [LICENSE](/LICENSE) file
