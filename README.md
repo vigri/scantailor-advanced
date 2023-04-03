@@ -1,5 +1,4 @@
 # ScanTailor Advanced
-===================
 
 The ScanTailor version that merges the features of the `ScanTailor Featured` and `ScanTailor Enhanced` versions,
 brings new ones and fixes.  
@@ -48,7 +47,6 @@ brings new ones and fixes.
     * [Guides](#guides)
 
 ## Description
-------------
 
 ScanTailor is an interactive post-processing tool for scanned pages. 
 It performs operations such as:
@@ -63,12 +61,10 @@ or [DjVu](http://elpa.gnu.org/packages/djvu.html) file. Scanning, optical charac
 and assembling multi-page documents are out of scope of this project.
 
 ## Building
-----------
 
 Go to [this repository](https://github.com/vigri/scantailor-libs-build) and follow the instructions given there.
 
 ## About this fork
-------------
 
 Unfortunately, the [repository](https://github.com/4lex4/scantailor-advanced/releases) of @4lex4 seems to be no longer active.
 
@@ -86,7 +82,6 @@ PRs are highly welcome ;-)
 
 
 ## Features
-----------
 
 ### ScanTailor Enhanced
 
