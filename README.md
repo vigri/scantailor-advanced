@@ -62,7 +62,7 @@ and assembling multi-page documents are out of scope of this project.
 
 ## Building
 
-Go to [this repository](https://github.com/vigri/scantailor-libs-build) and follow the instructions given there.
+Go to [this repository](https://github.com/ScanTailor-Advanced/scantailor-libs-build) and follow the instructions given there.
 
 ## About this fork
 
