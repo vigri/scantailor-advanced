@@ -5,7 +5,6 @@
 
 #include <QLineF>
 #include <QPointF>
-
 #include <algorithm>
 
 Proximity::Proximity(const QPointF& p1, const QPointF& p2) {
