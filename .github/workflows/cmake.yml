@@ -61,25 +61,3 @@ jobs:
       with:
         name: scantailor-linux-ubuntu-latest-qt5-rpm
         path: build/scantailor.rpm
-        
-  build-windows-qt5:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          repository: vigri/scantailor-libs-build
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          update: true
-          install: git mingw-w64-ucrt-x86_64-gcc mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libpng mingw-w64-x86_64-libtiff
-      - name: CI-Build
-        run: |
-          ./configure_msys.bat
-          ./configure_libs_x64.bat
-          mkdir build & cd build
-          cmake -G "MinGW Makefiles" --build ..
-          mingw64-make -j %NUMBER_OF_PROCESSORS%
