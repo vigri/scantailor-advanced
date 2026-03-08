@@ -20,6 +20,7 @@ OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelec
   angleSpinBox->setRange(-MAX_ANGLE, MAX_ANGLE);
   angleSpinBox->adjustSize();
   setSpinBoxUnknownState();
+  topEdgeCheckBox->setChecked(!m_settings->algoContentBased());
 
   setupUiConnections();
 }
@@ -167,9 +168,17 @@ double OptionsWidget::degreesToSpinBox(const double degrees) {
 
 #define CONNECT(...) m_connectionManager.addConnection(connect(__VA_ARGS__))
 
+void OptionsWidget::topEdgeToggled(bool checked) {
+  m_settings->setAlgoContentBased(!checked);
+  if (autoBtn->isChecked()) {
+    emit reloadRequested();
+  }
+}
+
 void OptionsWidget::setupUiConnections() {
   CONNECT(angleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(spinBoxValueChanged(double)));
   CONNECT(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+  CONNECT(topEdgeCheckBox, SIGNAL(toggled(bool)), this, SLOT(topEdgeToggled(bool)));
   CONNECT(applyDeskewBtn, SIGNAL(clicked()), this, SLOT(showDeskewDialog()));
 }
 

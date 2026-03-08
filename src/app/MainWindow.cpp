@@ -1117,8 +1117,11 @@ void MainWindow::startBatchProcessing() {
   m_interactiveQueue->cancelAndClear();
 
   m_batchQueue = std::make_unique<ProcessingTaskQueue>();
-  PageInfo page(m_thumbSequence->selectionLeader());
-  for (; !page.isNull(); page = m_thumbSequence->nextPage(page.id())) {
+  // Use full page sequence in current display order so all pages are processed
+  // (fixes batch missing pages when e.g. order is "decreasing deviation" and
+  // selection was not at the first page).
+  const PageSequence sequence(m_thumbSequence->toPageSequence());
+  for (const PageInfo& page : sequence) {
     for (int i = 0; i < m_stages->count(); i++) {
       m_stages->filterAt(i)->loadDefaultSettings(page);
     }
@@ -1143,9 +1146,9 @@ void MainWindow::startBatchProcessing() {
     stopBatchProcessing();
   }
 
-  page = m_batchQueue->selectedPage();
-  if (!page.isNull()) {
-    m_thumbSequence->setSelection(page.id());
+  PageInfo selectedPage(m_batchQueue->selectedPage());
+  if (!selectedPage.isNull()) {
+    m_thumbSequence->setSelection(selectedPage.id());
   }
   // Display the batch processing screen.
   updateMainArea();

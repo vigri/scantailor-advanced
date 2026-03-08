@@ -128,7 +128,8 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
 
       SkewFinder skewFinder;
       skewFinder.setResolutionRatio((double) rotatedDpm.horizontal() / rotatedDpm.vertical());
-      const Skew skew(skewFinder.findSkew(rotatedImage));
+      const Skew skew(m_settings->algoContentBased() ? skewFinder.findSkew(rotatedImage)
+                                                     : skewFinder.findSkewFromTopEdge(rotatedImage));
 
       if (skew.confidence() >= Skew::GOOD_CONFIDENCE) {
         uiData.setEffectiveDeskewAngle(-skew.angle());
