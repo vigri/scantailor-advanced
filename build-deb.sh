@@ -10,6 +10,8 @@ cd "$SCRIPT_DIR"
 
 # Optional: custom build directory (default: build)
 BUILD_DIR="${1:-build}"
+mkdir -p "$BUILD_DIR"
+BUILD_DIR="$(cd "$BUILD_DIR" && pwd)"
 PKG_DIR="${BUILD_DIR}/debian-pkg"
 DEBIAN_DIR="${PKG_DIR}/DEBIAN"
 
@@ -23,13 +25,12 @@ fi
 echo "Building ScanTailor Advanced ${VERSION}"
 
 # Configure and build
-mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
 make -j"$(nproc)"
 
 # Install into staging directory for the .deb
-rm -rf debian-pkg
+rm -rf "$PKG_DIR"
 make install DESTDIR="${PKG_DIR}"
 
 # Debian control file
@@ -82,6 +83,6 @@ chmod 755 "${DEBIAN_DIR}/postinst"
 
 # Build the .deb
 cd "$SCRIPT_DIR"
-dpkg-deb --root-owner-group --build "${BUILD_DIR}/debian-pkg" "scantailor-advanced_${VERSION}_${ARCH}.deb"
+dpkg-deb --root-owner-group --build "$PKG_DIR" "scantailor-advanced_${VERSION}_${ARCH}.deb"
 
 echo "Done: scantailor-advanced_${VERSION}_${ARCH}.deb"
