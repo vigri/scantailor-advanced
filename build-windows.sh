@@ -13,7 +13,7 @@
 #   ./build-windows.sh                    # uses MXE_DIR or ~/mxe or /opt/mxe
 #   ./build-windows.sh shared             # use .shared target (exe + DLLs)
 #
-# Output: build-win/scantailor.exe (and optionally a zip with exe + DLLs)
+# Output: build-win-static/scantailor.exe (default), or build-win-shared/ for shared (exe + DLLs)
 
 set -e
 
