@@ -397,4 +397,35 @@ has't been moved due to dirty realization. Their functionality is fully covered 
 Building
 ----------
 
+#### Building on Linux (Ubuntu / Debian)
+
+Install the required dependencies:
+
+```bash
+sudo apt install build-essential cmake \
+  qt5-qmake qtbase5-dev libqt5svg5-dev qttools5-dev \
+  libboost-test-dev libboost-dev \
+  libjpeg-dev libpng-dev libtiff-dev zlib1g-dev
+```
+
+Configure and build (out-of-tree build is required):
+
+```bash
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+```
+
+The executable will be in the `build` directory. To install system-wide: `sudo make install`.
+
+To build a `.deb` package (with application icon and menu entry):
+
+```bash
+./build-deb.sh
+```
+
+This compiles the project and produces `scantailor-advanced_<version>_<arch>.deb` in the project root. Install with `sudo dpkg -i scantailor-advanced_*.deb`.
+
+#### Building on Windows
+
 Go to [this repository](https://github.com/4lex4/scantailor-libs-build) and follow the instructions given there.
