@@ -426,6 +426,24 @@ To build a `.deb` package (with application icon and menu entry):
 
 This compiles the project and produces `scantailor-advanced_<version>_<arch>.deb` in the project root. Install with `sudo dpkg -i scantailor-advanced_*.deb`.
 
-#### Building on Windows
+#### Building a Windows .exe from Linux (cross-compile)
+
+You can cross-compile the Windows executable from Linux using [MXE](https://mxe.cc/) (M Cross Environment). One-time MXE setup (builds Qt5 and dependencies; can take 1–2 hours):
+
+```bash
+git clone https://github.com/mxe/mxe.git ~/mxe
+cd ~/mxe
+make MXE_TARGETS=x86_64-w64-mingw32.static qt5 jpeg libpng tiff zlib boost
+```
+
+Then from the ScanTailor Advanced source directory:
+
+```bash
+./build-windows.sh
+```
+
+This produces `build-win-static/scantailor.exe`. Use `./build-windows.sh shared` for a smaller build that requires shipping DLLs from MXE’s `usr/x86_64-w64-mingw32.shared/bin/` alongside the .exe.
+
+#### Building on Windows (native)
 
 Go to [this repository](https://github.com/4lex4/scantailor-libs-build) and follow the instructions given there.
