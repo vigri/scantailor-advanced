@@ -1,0 +1,25 @@
+# Lint: clang-format check (fails if any file would be reformatted)
+name: Lint
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  clang-format:
+    name: clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        run: |
+          SRC_FILES=$(find src -type f \( -name '*.cpp' -o -name '*.h' \) -not -path '*/translations/*')
+          if [ -z "$SRC_FILES" ]; then exit 0; fi
+          echo "$SRC_FILES" | xargs clang-format --dry-run -Werror
+          echo "All files are formatted."

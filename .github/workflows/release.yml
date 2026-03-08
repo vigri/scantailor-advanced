@@ -1,0 +1,43 @@
+# Release: build .deb and attach to GitHub Release on version tag
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-deb:
+    name: Build .deb and create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version from tag
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          sed -i "s/^#define VERSION \"[^\"]*\"/#define VERSION \"${VERSION}\"/" version.h.in
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake \
+            qt5-qmake qtbase5-dev libqt5svg5-dev qttools5-dev \
+            libboost-test-dev libboost-dev \
+            libjpeg-dev libpng-dev libtiff-dev zlib1g-dev
+
+      - name: Build .deb
+        run: ./build-deb.sh build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: scantailor-advanced_*_amd64.deb
+          generate_release_notes: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -284,6 +284,11 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1" APPLICATION_VERSION_PATC
 set(SCANTAILOR_RESOURCES_DIR "${CMAKE_SOURCE_DIR}/src/resources")
 set(SCANTAILOR_TRANSLATIONS_DIR "${CMAKE_SOURCE_DIR}/src/translations")
 
+configure_file(
+    "${SCANTAILOR_RESOURCES_DIR}/unix/scantailor.desktop.in"
+    "${CMAKE_BINARY_DIR}/scantailor.desktop"
+    @ONLY)
+
 add_subdirectory(src)
 
 # Translations
@@ -394,7 +399,7 @@ if (WIN32)
 endif()
 
 if (UNIX)
-  install(FILES "${SCANTAILOR_RESOURCES_DIR}/unix/scantailor.desktop"
+  install(FILES "${CMAKE_BINARY_DIR}/scantailor.desktop"
       DESTINATION "share/applications")
   install(FILES "${SCANTAILOR_RESOURCES_DIR}/appicon.svg"
       DESTINATION "share/icons/hicolor/scalable/apps"
