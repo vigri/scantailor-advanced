@@ -364,6 +364,22 @@ void OptionsWidget::applyAlignment(const std::set<PageId>& pages) {
   emit invalidateAllThumbnails();
 }
 
+void OptionsWidget::matchSizeToAllPages() {
+  std::set<PageId> allPages;
+  m_pageSelectionAccessor.allPages().selectAll().swap(allPages);
+  if (allPages.empty()) {
+    return;
+  }
+  m_alignment.setNull(false);
+  {
+    auto block = m_connectionManager.getScopedBlock();
+    alignWithOthersCB->setChecked(true);
+    updateAlignmentButtonsEnabled();
+  }
+  applyAlignment(allPages);
+  emit aggregateHardSizeChanged();
+}
+
 void OptionsWidget::updateMarginsDisplay() {
   auto block = m_connectionManager.getScopedBlock();
 
@@ -431,6 +447,7 @@ void OptionsWidget::setupUiConnections() {
   CONNECT(fixDpiBtn, SIGNAL(clicked()), this, SLOT(onFixDpiClicked()));
   CONNECT(alignWithOthersCB, SIGNAL(toggled(bool)), this, SLOT(alignWithOthersToggled()));
   CONNECT(applyAlignmentBtn, SIGNAL(clicked()), this, SLOT(showApplyAlignmentDialog()));
+  CONNECT(matchSizeToAllBtn, SIGNAL(clicked()), this, SLOT(matchSizeToAllPages()));
   for (const auto& kv : m_alignmentByButton) {
     CONNECT(kv.first, SIGNAL(clicked()), this, SLOT(alignmentButtonClicked()));
   }

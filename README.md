@@ -70,6 +70,10 @@ Go to [this repository](https://github.com/ScanTailor-Advanced/scantailor-libs-b
 
 **Windows – large JPEG/PNG (issue #20):** If large-format JPEG or PNG files fail to load on Windows, ensure the build uses **libjpeg-turbo** (or libjpeg 9+) and a recent libpng. The [scantailor-libs-build](https://github.com/ScanTailor-Advanced/scantailor-libs-build) repository provides compatible libraries.
 
+**Linux – Wayland (issue #97):** If you see rendering issues (blank or corrupted windows) when running under Wayland, try starting the application with `QT_QPA_PLATFORM=xcb` to use the X11 compatibility layer.
+
+**Linux – Flatpak / Flathub (issue #105):** A Flatpak manifest is provided in `flatpak/org.scantailor.Advanced.json`. To build locally: `flatpak-builder --user --force-clean build flatpak/org.scantailor.Advanced.json` (requires `flatpak` and `flatpak-builder`). To publish on Flathub, use a distinct application ID (e.g. `org.scantailor.Advanced`) so it does not conflict with the original ScanTailor package.
+
 ## About this fork
 
 Unfortunately, the [repository](https://github.com/4lex4/scantailor-advanced/releases) of @4lex4 seems to be no longer active.

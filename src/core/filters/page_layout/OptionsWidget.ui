@@ -740,6 +740,16 @@ QToolButton:pressed {
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="matchSizeToAllBtn">
+          <property name="text">
+           <string>Match size to all pages</string>
+          </property>
+          <property name="toolTip">
+           <string>Apply &quot;Match size with other pages&quot; to every page so they all share the same output size.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_12">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

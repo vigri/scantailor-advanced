@@ -5,6 +5,7 @@
 
 #include <QFile>
 #include <QImage>
+#include <QFileInfo>
 #include <QtGui/QImageReader>
 
 #include "ImageId.h"
@@ -35,6 +36,13 @@ QImage ImageLoader::load(QIODevice& ioDev, const int pageNum) {
   QImage image;
   QImageReader reader(&ioDev);
   reader.setAutoTransform(true);  // Helps with orientation and some formats (issue #20).
+  // Issue #98: on some builds Qt may not detect JPG format; force it for .jpg/.jpeg files.
+  if (QFile* file = qobject_cast<QFile*>(&ioDev)) {
+    const QString ext = QFileInfo(file->fileName()).suffix().toLower();
+    if (ext == QStringLiteral("jpg") || ext == QStringLiteral("jpeg")) {
+      reader.setFormat("jpeg");
+    }
+  }
   reader.read(&image);
   return image;
 }

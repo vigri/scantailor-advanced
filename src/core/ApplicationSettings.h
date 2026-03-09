@@ -109,6 +109,11 @@ class ApplicationSettings {
 
   void setDefaultZoneCreationMode(int mode);
 
+  /** Show center guides in Output view. Issue #82. */
+  bool isOutputShowGuidesEnabled() const;
+
+  void setOutputShowGuidesEnabled(bool enabled);
+
  private:
   static inline QString getKey(const QString& keyName);
 
@@ -157,8 +162,10 @@ class ApplicationSettings {
   static const QString CURRENT_PROFILE_KEY;
   static const QString SHOW_CANCELING_SELECTION_QUESTION_KEY;
   static const QString DEFAULT_ZONE_CREATION_MODE_KEY;
+  static const QString OUTPUT_SHOW_GUIDES_KEY;
 
   static const int DEFAULT_ZONE_CREATION_MODE;  // 0 = polygonal
+  static const bool DEFAULT_OUTPUT_SHOW_GUIDES;
 
   QSettings m_settings;
 };

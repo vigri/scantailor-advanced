@@ -87,6 +87,8 @@ class OptionsWidget : public FilterOptionsWidget, public UnitsListener, private 
 
   void showApplyAlignmentDialog();
 
+  void matchSizeToAllPages();
+
   void onFixDpiClicked();
 
   void applyMargins(const std::set<PageId>& pages,
