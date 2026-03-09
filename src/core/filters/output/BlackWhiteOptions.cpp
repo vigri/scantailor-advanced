@@ -68,10 +68,14 @@ bool BlackWhiteOptions::operator!=(const BlackWhiteOptions& other) const {
 }
 
 BinarizationMethod BlackWhiteOptions::parseBinarizationMethod(const QString& str) {
-  if (str == "wolf") {
-    return T_WOLF;
-  } else if (str == "sauvola") {
+  if (str == "sauvola") {
     return T_SAUVOLA;
+  } else if (str == "wolf") {
+    return T_WOLF;
+  } else if (str == "fox") {
+    return T_FOX;
+  } else if (str == "window") {
+    return T_WINDOW;
   } else if (str == "bradley") {
     return T_BRADLEY;
   } else if (str == "grad") {
@@ -98,6 +102,12 @@ QString BlackWhiteOptions::formatBinarizationMethod(BinarizationMethod type) {
       break;
     case T_WOLF:
       str = "wolf";
+      break;
+    case T_FOX:
+      str = "fox";
+      break;
+    case T_WINDOW:
+      str = "window";
       break;
     case T_BRADLEY:
       str = "bradley";

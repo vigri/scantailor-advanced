@@ -14,7 +14,7 @@
 #include <memory>
 #include <set>
 
-#include "BinarizationOptionsWidget.h"
+#include "OptionsWidgetBinarization.h"
 #include "ColorParams.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
@@ -175,7 +175,7 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
 
   void updateProcessingDisplay();
 
-  void addBinarizationOptionsWidget(BinarizationOptionsWidget* widget);
+  void addOptionsWidgetBinarization(OptionsWidgetBinarization* widget);
 
   void setupUiConnections();
 

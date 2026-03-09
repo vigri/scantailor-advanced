@@ -2335,6 +2335,26 @@ BinaryImage OutputGenerator::Processor::binarize(const QImage& image) const {
       binarized = binarizeWolf(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
       break;
     }
+    case T_FOX: {
+      const double thresholdDelta = blackWhiteOptions.thresholdAdjustment();
+      const QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
+      const auto lowerBound = (unsigned char) blackWhiteOptions.getWolfLowerBound();
+      const auto upperBound = (unsigned char) blackWhiteOptions.getWolfUpperBound();
+      const double thresholdCoef = blackWhiteOptions.getWolfCoef();
+
+      binarized = binarizeFox(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
+      break;
+    }
+    case T_WINDOW: {
+      const double thresholdDelta = blackWhiteOptions.thresholdAdjustment();
+      const QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
+      const auto lowerBound = (unsigned char) blackWhiteOptions.getWolfLowerBound();
+      const auto upperBound = (unsigned char) blackWhiteOptions.getWolfUpperBound();
+      const double thresholdCoef = blackWhiteOptions.getWolfCoef();
+
+      binarized = binarizeWindow(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
+      break;
+    }
     case T_BRADLEY: {
       const double thresholdDelta = blackWhiteOptions.thresholdAdjustment();
       const QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());

@@ -10,18 +10,18 @@
 #include <list>
 #include <memory>
 
-#include "BinarizationOptionsWidget.h"
+#include "OptionsWidgetBinarization.h"
 #include "ColorParams.h"
 #include "Settings.h"
-#include "ui_WolfBinarizationOptionsWidget.h"
+#include "ui_OptionsWidgetBinarizationWolf.h"
 
 namespace output {
-class WolfBinarizationOptionsWidget : public BinarizationOptionsWidget, private Ui::WolfBinarizationOptionsWidget {
+class OptionsWidgetBinarizationWolf : public OptionsWidgetBinarization, private Ui::OptionsWidgetBinarizationWolf {
   Q_OBJECT
  public:
-  explicit WolfBinarizationOptionsWidget(std::shared_ptr<Settings> settings);
+  explicit OptionsWidgetBinarizationWolf(std::shared_ptr<Settings> settings);
 
-  ~WolfBinarizationOptionsWidget() override = default;
+  ~OptionsWidgetBinarizationWolf() override = default;
 
   void updateUi(const PageId& m_pageId) override;
 

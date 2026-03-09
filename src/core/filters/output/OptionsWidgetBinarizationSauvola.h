@@ -10,19 +10,19 @@
 #include <list>
 #include <memory>
 
-#include "BinarizationOptionsWidget.h"
+#include "OptionsWidgetBinarization.h"
 #include "ColorParams.h"
 #include "Settings.h"
-#include "ui_SauvolaBinarizationOptionsWidget.h"
+#include "ui_OptionsWidgetBinarizationSauvola.h"
 
 namespace output {
-class SauvolaBinarizationOptionsWidget : public BinarizationOptionsWidget,
-                                         private Ui::SauvolaBinarizationOptionsWidget {
+class OptionsWidgetBinarizationSauvola : public OptionsWidgetBinarization,
+                                         private Ui::OptionsWidgetBinarizationSauvola {
   Q_OBJECT
  public:
-  explicit SauvolaBinarizationOptionsWidget(std::shared_ptr<Settings> settings);
+  explicit OptionsWidgetBinarizationSauvola(std::shared_ptr<Settings> settings);
 
-  ~SauvolaBinarizationOptionsWidget() override = default;
+  ~OptionsWidgetBinarizationSauvola() override = default;
 
   void updateUi(const PageId& m_pageId) override;
 
