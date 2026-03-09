@@ -262,7 +262,7 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
 
   bool saveProjectWithFeedback(const QString& projectFile);
 
-  void showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId& existig);
+  void showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId& existing);
 
   void showRemovePagesDialog(const std::set<PageId>& pages);
 

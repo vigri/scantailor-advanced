@@ -1713,7 +1713,8 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
   if (isBatchProcessingInProgress() || !isProjectLoaded()) {
     return;
   }
-  // We need to filter out files already in project.
+  // We need to filter out files already in project (issue #88: use normalized paths so
+  // dialog and project paths compare correctly when project already has images).
   class ProxyModel : public QSortFilterProxyModel {
    public:
     explicit ProxyModel(const ProjectPages& pages) {
@@ -1721,7 +1722,10 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
 
       const PageSequence sequence(pages.toPageSequence(IMAGE_VIEW));
       for (const PageInfo& page : sequence) {
-        m_inProjectFiles.push_back(QFileInfo(page.imageId().filePath()));
+        const QString path(QFileInfo(page.imageId().filePath()).absoluteFilePath());
+        if (!path.isEmpty()) {
+          m_inProjectPaths.insert(QDir::cleanPath(path));
+        }
       }
     }
 
@@ -1732,18 +1736,26 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
       if (data.isNull()) {
         return true;
       }
-      return !m_inProjectFiles.contains(QFileInfo(data.toString()));
+      const QString path(QDir::cleanPath(QFileInfo(data.toString()).absoluteFilePath()));
+      return !m_inProjectPaths.contains(path);
     }
 
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override { return left.row() < right.row(); }
 
    private:
-    QFileInfoList m_inProjectFiles;
+    QSet<QString> m_inProjectPaths;
   };
 
-
-  auto dialog
-      = std::make_unique<QFileDialog>(this, tr("Files to insert"), QFileInfo(existing.filePath()).absolutePath());
+  QString dialogDir;
+  if (existing.isNull()) {
+    dialogDir = m_projectFile.isEmpty() ? QDir::homePath() : QFileInfo(m_projectFile).absolutePath();
+  } else {
+    dialogDir = QFileInfo(existing.filePath()).absolutePath();
+    if (dialogDir.isEmpty()) {
+      dialogDir = m_projectFile.isEmpty() ? QDir::homePath() : QFileInfo(m_projectFile).absolutePath();
+    }
+  }
+  auto dialog = std::make_unique<QFileDialog>(this, tr("Files to insert"), dialogDir);
   dialog->setFileMode(QFileDialog::ExistingFiles);
   dialog->setProxyModel(new ProxyModel(*m_pages));
   dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));

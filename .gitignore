@@ -1,5 +1,6 @@
 CMakeLists.txt.user
 build/
+build-*/
 cmake-build-*/
 out/
 bin/
