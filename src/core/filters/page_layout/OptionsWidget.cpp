@@ -11,6 +11,7 @@
 
 #include "../../Utils.h"
 #include "ApplyDialog.h"
+#include "ApplyMarginsDialog.h"
 #include "Settings.h"
 
 using namespace core;
@@ -291,10 +292,11 @@ void OptionsWidget::alignmentButtonClicked() {
 }
 
 void OptionsWidget::showApplyMarginsDialog() {
-  auto* dialog = new ApplyDialog(this, m_pageId, m_pageSelectionAccessor);
+  auto* dialog = new ApplyMarginsDialog(this, m_pageId, m_pageSelectionAccessor);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->setWindowTitle(tr("Apply Margins"));
-  connect(dialog, SIGNAL(accepted(const std::set<PageId>&)), this, SLOT(applyMargins(const std::set<PageId>&)));
+  connect(dialog, SIGNAL(accepted(const std::set<PageId>&, bool, bool, bool, bool)), this,
+          SLOT(applyMargins(const std::set<PageId>&, bool, bool, bool, bool)));
   dialog->show();
 }
 
@@ -306,7 +308,11 @@ void OptionsWidget::showApplyAlignmentDialog() {
   dialog->show();
 }
 
-void OptionsWidget::applyMargins(const std::set<PageId>& pages) {
+void OptionsWidget::applyMargins(const std::set<PageId>& pages,
+                                 bool applyLeft,
+                                 bool applyRight,
+                                 bool applyTop,
+                                 bool applyBottom) {
   if (pages.empty()) {
     return;
   }
@@ -321,7 +327,20 @@ void OptionsWidget::applyMargins(const std::set<PageId>& pages) {
     if (autoMarginsEnabled) {
       m_settings->invalidateContentSize(pageId);
     } else {
-      m_settings->setHardMarginsMM(pageId, m_marginsMM);
+      Margins target = m_settings->getHardMarginsMM(pageId);
+      if (applyLeft) {
+        target.setLeft(m_marginsMM.left());
+      }
+      if (applyRight) {
+        target.setRight(m_marginsMM.right());
+      }
+      if (applyTop) {
+        target.setTop(m_marginsMM.top());
+      }
+      if (applyBottom) {
+        target.setBottom(m_marginsMM.bottom());
+      }
+      m_settings->setHardMarginsMM(pageId, target);
     }
   }
 

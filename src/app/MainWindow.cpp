@@ -29,6 +29,7 @@
 #include "DefaultParamsDialog.h"
 #include "ErrorWidget.h"
 #include "FilterOptionsWidget.h"
+#include "ImageViewBase.h"
 #include "FixDpiDialog.h"
 #include "ImageInfo.h"
 #include "ImageMetadataLoader.h"
@@ -105,6 +106,7 @@ MainWindow::MainWindow()
       m_interactiveQueue(std::make_unique<ProcessingTaskQueue>()),
       m_outOfMemoryDialog(std::make_unique<OutOfMemoryDialog>()),
       m_curFilter(0),
+      m_savedZoomLevel(1.0),
       m_ignoreSelectionChanges(0),
       m_ignorePageOrderingChanges(0),
       m_debug(false),
@@ -716,6 +718,13 @@ void MainWindow::setImageWidget(QWidget* widget, const Ownership ownership, Debu
     return;
   }
 
+  if (!overlay && m_imageFrameLayout->count() > 0) {
+    QWidget* oldW = m_imageFrameLayout->widget(0);
+    if (ImageViewBase* oldView = Utils::castOrFindChild<ImageViewBase*>(oldW)) {
+      m_savedZoomLevel = oldView->zoomLevel();
+    }
+  }
+
   if (!overlay) {
     removeImageWidget();
   }
@@ -729,6 +738,9 @@ void MainWindow::setImageWidget(QWidget* widget, const Ownership ownership, Debu
       m_imageFrameLayout->addWidget(widget);
       if (overlay) {
         m_imageFrameLayout->setCurrentWidget(widget);
+      }
+      if (ImageViewBase* newView = Utils::castOrFindChild<ImageViewBase*>(widget)) {
+        newView->setZoomLevel(m_savedZoomLevel);
       }
     }
   } else {
