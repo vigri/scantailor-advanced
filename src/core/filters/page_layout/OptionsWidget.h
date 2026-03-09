@@ -87,6 +87,8 @@ class OptionsWidget : public FilterOptionsWidget, public UnitsListener, private 
 
   void showApplyAlignmentDialog();
 
+  void onFixDpiClicked();
+
   void applyMargins(const std::set<PageId>& pages);
 
   void applyAlignment(const std::set<PageId>& pages);

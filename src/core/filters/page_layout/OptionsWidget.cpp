@@ -409,6 +409,7 @@ void OptionsWidget::setupUiConnections() {
   CONNECT(topBottomLink, SIGNAL(clicked()), this, SLOT(topBottomLinkClicked()));
   CONNECT(leftRightLink, SIGNAL(clicked()), this, SLOT(leftRightLinkClicked()));
   CONNECT(applyMarginsBtn, SIGNAL(clicked()), this, SLOT(showApplyMarginsDialog()));
+  CONNECT(fixDpiBtn, SIGNAL(clicked()), this, SLOT(onFixDpiClicked()));
   CONNECT(alignWithOthersCB, SIGNAL(toggled(bool)), this, SLOT(alignWithOthersToggled()));
   CONNECT(applyAlignmentBtn, SIGNAL(clicked()), this, SLOT(showApplyAlignmentDialog()));
   for (const auto& kv : m_alignmentByButton) {
@@ -496,5 +497,9 @@ void OptionsWidget::setupIcons() {
   alignCenterBtn->setIcon(iconProvider.getIcon("stock-center"));
   m_chainIcon = iconProvider.getIcon("stock-vchain");
   m_brokenChainIcon = iconProvider.getIcon("stock-vchain-broken");
+}
+
+void OptionsWidget::onFixDpiClicked() {
+  emit fixDpiRequested();  // MainWindow opens FixDpiDialog (issue #93).
 }
 }  // namespace page_layout

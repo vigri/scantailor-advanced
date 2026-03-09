@@ -33,6 +33,8 @@ QImage ImageLoader::load(QIODevice& ioDev, const int pageNum) {
   }
 
   QImage image;
-  QImageReader(&ioDev).read(&image);
+  QImageReader reader(&ioDev);
+  reader.setAutoTransform(true);  // Helps with orientation and some formats (issue #20).
+  reader.read(&image);
   return image;
 }

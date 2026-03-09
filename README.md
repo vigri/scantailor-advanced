@@ -68,6 +68,8 @@ and assembling multi-page documents are out of scope of this project.
 
 Go to [this repository](https://github.com/ScanTailor-Advanced/scantailor-libs-build) and follow the instructions given there.
 
+**Windows – large JPEG/PNG (issue #20):** If large-format JPEG or PNG files fail to load on Windows, ensure the build uses **libjpeg-turbo** (or libjpeg 9+) and a recent libpng. The [scantailor-libs-build](https://github.com/ScanTailor-Advanced/scantailor-libs-build) repository provides compatible libraries.
+
 ## About this fork
 
 Unfortunately, the [repository](https://github.com/4lex4/scantailor-advanced/releases) of @4lex4 seems to be no longer active.
@@ -439,6 +441,8 @@ mkdir build && cd build
 cmake ..
 make -j$(nproc)
 ```
+
+For **offline or minimal chroot** builds where unit tests cannot be built (issue #61), use `cmake -DBUILD_TESTS=OFF ..` to skip the test targets.
 
 The executable will be in the `build` directory. To install system-wide: `sudo make install`.
 

@@ -52,6 +52,8 @@ const QString ApplicationSettings::LANGUAGE_KEY = "language";
 const QString ApplicationSettings::UNITS_KEY = "units";
 const QString ApplicationSettings::CURRENT_PROFILE_KEY = "current_profile";
 const QString ApplicationSettings::SHOW_CANCELING_SELECTION_QUESTION_KEY = "selection_canceling_question";
+const QString ApplicationSettings::DEFAULT_ZONE_CREATION_MODE_KEY = "default_zone_creation_mode";
+const int ApplicationSettings::DEFAULT_ZONE_CREATION_MODE = 0;  // POLYGONAL
 
 QString ApplicationSettings::getKey(const QString& keyName) {
   return ApplicationSettings::ROOT_KEY + '/' + keyName;
@@ -234,4 +236,15 @@ bool ApplicationSettings::isCancelingSelectionQuestionEnabled() {
 
 void ApplicationSettings::setCancelingSelectionQuestionEnabled(bool enabled) {
   m_settings.setValue(getKey(SHOW_CANCELING_SELECTION_QUESTION_KEY), enabled);
+}
+
+int ApplicationSettings::getDefaultZoneCreationMode() const {
+  const int v = m_settings.value(getKey(DEFAULT_ZONE_CREATION_MODE_KEY), DEFAULT_ZONE_CREATION_MODE).toInt();
+  return (v >= 0 && v <= 2) ? v : DEFAULT_ZONE_CREATION_MODE;
+}
+
+void ApplicationSettings::setDefaultZoneCreationMode(const int mode) {
+  if (mode >= 0 && mode <= 2) {
+    m_settings.setValue(getKey(DEFAULT_ZONE_CREATION_MODE_KEY), mode);
+  }
 }

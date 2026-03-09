@@ -264,7 +264,11 @@ if (WIN32 AND MSVC)
   add_definitions(-DNOMINMAX)
 endif()
 
-enable_testing()
+# Option to disable tests for offline/chroot builds where Boost or test deps may be missing (issue #61).
+option(BUILD_TESTS "Build unit tests (math_tests, imageproc_tests, core_tests)" ON)
+if (BUILD_TESTS)
+  enable_testing()
+endif()
 
 # Prepare config.h
 option(PORTABLE_VERSION "Whether to build the portable version." ON)

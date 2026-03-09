@@ -690,6 +690,7 @@ void MainWindow::setOptionsWidget(FilterOptionsWidget* widget, const Ownership o
                SLOT(invalidateThumbnail(const PageInfo&)));
     disconnect(m_optionsWidget, SIGNAL(invalidateAllThumbnails()), this, SLOT(invalidateAllThumbnails()));
     disconnect(m_optionsWidget, SIGNAL(goToPage(const PageId&)), this, SLOT(goToPage(const PageId&)));
+    disconnect(m_optionsWidget, SIGNAL(fixDpiRequested()), this, SLOT(fixDpiDialogRequested()));
   }
 
   m_optionsFrameLayout->addWidget(widget);
@@ -704,6 +705,7 @@ void MainWindow::setOptionsWidget(FilterOptionsWidget* widget, const Ownership o
   connect(widget, SIGNAL(invalidateThumbnail(const PageInfo&)), this, SLOT(invalidateThumbnail(const PageInfo&)));
   connect(widget, SIGNAL(invalidateAllThumbnails()), this, SLOT(invalidateAllThumbnails()));
   connect(widget, SIGNAL(goToPage(const PageId&)), this, SLOT(goToPage(const PageId&)));
+  connect(widget, SIGNAL(fixDpiRequested()), this, SLOT(fixDpiDialogRequested()));
 }  // MainWindow::setOptionsWidget
 
 void MainWindow::setImageWidget(QWidget* widget, const Ownership ownership, DebugImages* debugImages, bool overlay) {
@@ -899,7 +901,8 @@ void MainWindow::currentPageChanged(const PageInfo& pageInfo,
 
   if ((flags & ThumbnailSequence::SELECTED_BY_USER) || focusButton->isChecked()) {
     if (!(flags & ThumbnailSequence::AVOID_SCROLLING_TO)) {
-      thumbView->ensureVisible(thumbRect, 0, 0);
+      const int scrollMargin = 20;  // Keep selected thumbnail away from edge (issue #51).
+      thumbView->ensureVisible(thumbRect, scrollMargin, scrollMargin);
     }
   }
 
@@ -982,7 +985,8 @@ void MainWindow::thumbViewFocusToggled(const bool checked) {
   }
 
   if (checked) {
-    thumbView->ensureVisible(rect, 0, 0);
+    const int scrollMargin = 20;  // Follow Page: keep thumbnail visible with padding (issue #51).
+    thumbView->ensureVisible(rect, scrollMargin, scrollMargin);
   }
 }
 
