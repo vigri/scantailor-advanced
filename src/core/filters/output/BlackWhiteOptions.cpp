@@ -21,7 +21,7 @@ BlackWhiteOptions::BlackWhiteOptions()
       m_wolfLowerBound(1),
       m_wolfUpperBound(254),
       m_wolfCoef(0.3),
-      m_binarizationMethod(OTSU) {}
+      m_binarizationMethod(T_OTSU) {}
 
 BlackWhiteOptions::BlackWhiteOptions(const QDomElement& el)
     : m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
@@ -69,25 +69,50 @@ bool BlackWhiteOptions::operator!=(const BlackWhiteOptions& other) const {
 
 BinarizationMethod BlackWhiteOptions::parseBinarizationMethod(const QString& str) {
   if (str == "wolf") {
-    return WOLF;
+    return T_WOLF;
   } else if (str == "sauvola") {
-    return SAUVOLA;
+    return T_SAUVOLA;
+  } else if (str == "bradley") {
+    return T_BRADLEY;
+  } else if (str == "grad") {
+    return T_GRAD;
+  } else if (str == "edgeplus") {
+    return T_EDGEPLUS;
+  } else if (str == "blurdiv") {
+    return T_BLURDIV;
+  } else if (str == "edgediv") {
+    return T_EDGEDIV;
   } else {
-    return OTSU;
+    return T_OTSU;
   }
 }
 
 QString BlackWhiteOptions::formatBinarizationMethod(BinarizationMethod type) {
   QString str = "";
   switch (type) {
-    case OTSU:
+    case T_OTSU:
       str = "otsu";
       break;
-    case SAUVOLA:
+    case T_SAUVOLA:
       str = "sauvola";
       break;
-    case WOLF:
+    case T_WOLF:
       str = "wolf";
+      break;
+    case T_BRADLEY:
+      str = "bradley";
+      break;
+    case T_GRAD:
+      str = "grad";
+      break;
+    case T_EDGEPLUS:
+      str = "edgeplus";
+      break;
+    case T_BLURDIV:
+      str = "blurdiv";
+      break;
+    case T_EDGEDIV:
+      str = "edgediv";
       break;
   }
   return str;

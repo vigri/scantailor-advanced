@@ -1,4 +1,4 @@
-# Directorios de compilación
+CMakeLists.txt.user
 build/
 cmake-build-*/
 out/
@@ -79,7 +79,7 @@ Desktop.ini
 
 # Depuradores y profiling
 *.core
-core
+/core
 *.stackdump
 *.pdb
 *.ilk
