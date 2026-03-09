@@ -42,7 +42,8 @@ void OptionsWidget::appliedTo(const std::set<PageId>& pages) {
     return;
   }
 
-  const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.dependencies(), m_uiData.mode());
+  const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.effectiveObliqueAngle(), m_uiData.dependencies(),
+                     m_uiData.mode());
   m_settings->setDegrees(pages, params);
 
   if (pages.size() > 1) {
@@ -59,7 +60,8 @@ void OptionsWidget::appliedToAllPages(const std::set<PageId>& pages) {
     return;
   }
 
-  const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.dependencies(), m_uiData.mode());
+  const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.effectiveObliqueAngle(), m_uiData.dependencies(),
+                     m_uiData.mode());
   m_settings->setDegrees(pages, params);
   emit invalidateAllThumbnails();
 }
@@ -92,6 +94,7 @@ void OptionsWidget::postUpdateUI(const UiData& uiData) {
   manualBtn->setEnabled(true);
   updateModeIndication(uiData.mode());
   setSpinBoxKnownState(degreesToSpinBox(uiData.effectiveDeskewAngle()));
+  obliqueSpinBox->setValue(uiData.effectiveObliqueAngle());
 }
 
 void OptionsWidget::spinBoxValueChanged(const double value) {
@@ -135,6 +138,8 @@ void OptionsWidget::setSpinBoxUnknownState() {
   angleSpinBox->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   angleSpinBox->setValue(angleSpinBox->minimum());
   angleSpinBox->setEnabled(false);
+  obliqueSpinBox->setValue(0.0);
+  obliqueSpinBox->setEnabled(false);
 }
 
 void OptionsWidget::setSpinBoxKnownState(const double angle) {
@@ -146,10 +151,12 @@ void OptionsWidget::setSpinBoxKnownState(const double angle) {
   // Right alignment doesn't work correctly, so we use the left one.
   angleSpinBox->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   angleSpinBox->setEnabled(true);
+  obliqueSpinBox->setEnabled(true);
 }
 
 void OptionsWidget::commitCurrentParams() {
-  Params params(m_uiData.effectiveDeskewAngle(), m_uiData.dependencies(), m_uiData.mode());
+  Params params(m_uiData.effectiveDeskewAngle(), m_uiData.effectiveObliqueAngle(), m_uiData.dependencies(),
+                m_uiData.mode());
   m_settings->setPageParams(m_pageId, params);
 }
 
@@ -175,8 +182,17 @@ void OptionsWidget::topEdgeToggled(bool checked) {
   }
 }
 
+void OptionsWidget::obliqueSpinBoxValueChanged(double value) {
+  auto block = m_connectionManager.getScopedBlock();
+
+  m_uiData.setEffectiveObliqueAngle(value);
+  commitCurrentParams();
+  emit invalidateThumbnail(m_pageId);
+}
+
 void OptionsWidget::setupUiConnections() {
   CONNECT(angleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(spinBoxValueChanged(double)));
+  CONNECT(obliqueSpinBox, SIGNAL(valueChanged(double)), this, SLOT(obliqueSpinBoxValueChanged(double)));
   CONNECT(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
   CONNECT(topEdgeCheckBox, SIGNAL(toggled(bool)), this, SLOT(topEdgeToggled(bool)));
   CONNECT(applyDeskewBtn, SIGNAL(clicked()), this, SLOT(showDeskewDialog()));
@@ -186,7 +202,7 @@ void OptionsWidget::setupUiConnections() {
 
 /*========================== OptionsWidget::UiData =========================*/
 
-OptionsWidget::UiData::UiData() : m_effDeskewAngle(0.0), m_mode(MODE_AUTO) {}
+OptionsWidget::UiData::UiData() : m_effDeskewAngle(0.0), m_effObliqueAngle(0.0), m_mode(MODE_AUTO) {}
 
 OptionsWidget::UiData::~UiData() = default;
 }  // namespace deskew

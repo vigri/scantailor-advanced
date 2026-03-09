@@ -34,6 +34,10 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
 
     double effectiveDeskewAngle() const;
 
+    void setEffectiveObliqueAngle(double degrees);
+
+    double effectiveObliqueAngle() const;
+
     void setDependencies(const Dependencies& deps);
 
     const Dependencies& dependencies() const;
@@ -44,6 +48,7 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
 
    private:
     double m_effDeskewAngle;
+    double m_effObliqueAngle;
     Dependencies m_deps;
     AutoManualMode m_mode;
   };
@@ -69,6 +74,8 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
  private slots:
 
   void spinBoxValueChanged(double skewDegrees);
+
+  void obliqueSpinBoxValueChanged(double obliqueDegrees);
 
   void modeChanged(bool autoMode);
 
@@ -113,6 +120,14 @@ inline void OptionsWidget::UiData::setEffectiveDeskewAngle(const double degrees)
 
 inline double OptionsWidget::UiData::effectiveDeskewAngle() const {
   return m_effDeskewAngle;
+}
+
+inline void OptionsWidget::UiData::setEffectiveObliqueAngle(const double degrees) {
+  m_effObliqueAngle = degrees;
+}
+
+inline double OptionsWidget::UiData::effectiveObliqueAngle() const {
+  return m_effObliqueAngle;
 }
 
 inline void OptionsWidget::UiData::setDependencies(const Dependencies& deps) {

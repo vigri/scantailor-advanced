@@ -96,9 +96,10 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
       params.reset();
     } else {
       uiData.setEffectiveDeskewAngle(params->deskewAngle());
+      uiData.setEffectiveObliqueAngle(params->obliqueAngle());
       uiData.setMode(params->mode());
 
-      Params newParams(uiData.effectiveDeskewAngle(), deps, uiData.mode());
+      Params newParams(uiData.effectiveDeskewAngle(), uiData.effectiveObliqueAngle(), deps, uiData.mode());
       m_settings->setPageParams(m_pageId, newParams);
     }
   }
@@ -138,7 +139,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
       }
       uiData.setMode(MODE_AUTO);
 
-      Params newParams(uiData.effectiveDeskewAngle(), deps, uiData.mode());
+      Params newParams(uiData.effectiveDeskewAngle(), uiData.effectiveObliqueAngle(), deps, uiData.mode());
       m_settings->setPageParams(m_pageId, newParams);
 
       status.throwIfCancelled();
@@ -147,6 +148,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
 
   ImageTransformation newXform(data.xform());
   newXform.setPostRotation(uiData.effectiveDeskewAngle());
+  newXform.setPostOblique(uiData.effectiveObliqueAngle());
 
   if (m_nextTask) {
     return m_nextTask->process(status, FilterData(data, newXform));
