@@ -90,11 +90,14 @@ void OptionsWidget::postUpdateUI(const UiData& uiData) {
   auto block = m_connectionManager.getScopedBlock();
 
   m_uiData = uiData;
+  if (uiData.mode() == MODE_AUTO) {
+    m_uiData.setEffectiveObliqueAngle(0.0);  // Auto ==> Oblique = 0 (PR #108 feedback)
+  }
   autoBtn->setEnabled(true);
   manualBtn->setEnabled(true);
   updateModeIndication(uiData.mode());
   setSpinBoxKnownState(degreesToSpinBox(uiData.effectiveDeskewAngle()));
-  obliqueSpinBox->setValue(uiData.effectiveObliqueAngle());
+  obliqueSpinBox->setValue(m_uiData.effectiveObliqueAngle());
 }
 
 void OptionsWidget::spinBoxValueChanged(const double value) {
@@ -113,6 +116,7 @@ void OptionsWidget::spinBoxValueChanged(const double value) {
 void OptionsWidget::modeChanged(const bool autoMode) {
   if (autoMode) {
     m_uiData.setMode(MODE_AUTO);
+    m_uiData.setEffectiveObliqueAngle(0.0);  // Auto ==> Oblique = 0 (PR #108 feedback)
     m_settings->clearPageParams(m_pageId);
     emit reloadRequested();
   } else {
@@ -186,6 +190,10 @@ void OptionsWidget::obliqueSpinBoxValueChanged(double value) {
   auto block = m_connectionManager.getScopedBlock();
 
   m_uiData.setEffectiveObliqueAngle(value);
+  if (value != 0.0) {
+    m_uiData.setMode(MODE_MANUAL);  // Oblique != 0 ==> Mode = Manual (PR #108 feedback)
+    updateModeIndication(MODE_MANUAL);
+  }
   commitCurrentParams();
   emit invalidateThumbnail(m_pageId);
 }
