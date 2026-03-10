@@ -3,6 +3,7 @@ set(sources
     TestBinaryImage.cpp TestReduceThreshold.cpp
     TestSlicedHistogram.cpp
     TestConnCompEraser.cpp TestConnCompEraserExt.cpp
+    TestDpi.cpp
     TestGrayscale.cpp
     TestRasterOp.cpp TestShear.cpp
     TestOrthogonalRotation.cpp

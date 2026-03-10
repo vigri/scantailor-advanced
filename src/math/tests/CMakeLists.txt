@@ -1,8 +1,12 @@
 set(sources
     main.cpp
     TestHessians.cpp
-    TestSqDistApproximant.cpp
-    TestMatrixCalc.cpp)
+    TestLineBoundedByRect.cpp
+    TestLinearFunction.cpp
+    TestMatrixCalc.cpp
+    TestQuadraticFunction.cpp
+    TestSidesOfLine.cpp
+    TestSqDistApproximant.cpp)
 
 add_executable(math_tests ${sources})
 target_link_libraries(
