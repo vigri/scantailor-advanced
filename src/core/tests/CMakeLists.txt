@@ -1,6 +1,8 @@
 set(sources
     main.cpp
     TestContentSpanFinder.cpp
+    TestDeskewParams.cpp
+    TestSelectContentApply.cpp
     TestSmartFilenameOrdering.cpp)
 
 add_executable(core_tests ${sources})

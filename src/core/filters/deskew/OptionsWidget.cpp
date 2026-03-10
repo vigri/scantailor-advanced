@@ -90,9 +90,6 @@ void OptionsWidget::postUpdateUI(const UiData& uiData) {
   auto block = m_connectionManager.getScopedBlock();
 
   m_uiData = uiData;
-  if (uiData.mode() == MODE_AUTO) {
-    m_uiData.setEffectiveObliqueAngle(0.0);  // Auto ==> Oblique = 0 (PR #108 feedback)
-  }
   autoBtn->setEnabled(true);
   manualBtn->setEnabled(true);
   updateModeIndication(uiData.mode());
