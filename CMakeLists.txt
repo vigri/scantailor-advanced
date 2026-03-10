@@ -210,13 +210,13 @@ set(qt_min_version 5.9)
 
 find_package(
     Qt6
-    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg OpenGLWidgets
+    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg OpenGLWidgets Test
     CONFIG)
 if (Qt6_FOUND)
     set(QT_BINDIR "${QT6_INSTALL_PREFIX}/bin")
 else()
   find_package(Qt5 ${qt_min_version}
-    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg
+    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg Test
     CONFIG REQUIRED)
     set(QT_BINDIR "${QT5_INSTALL_PREFIX}/bin")
 endif()
@@ -230,6 +230,7 @@ if(Qt6_FOUND)
   set(Qt_Widgets_lib Qt::Widgets)
   set(Qt_Xml_lib Qt::Xml)
   set(Qt_OpenGLWidgets_lib Qt::OpenGLWidgets)
+  set(Qt_Test_lib Qt::Test)
 else()
   set(Qt_Core_lib Qt5::Core)
   set(Qt_Gui_lib Qt5::Gui)
@@ -238,6 +239,7 @@ else()
   set(Qt_Svg_lib Qt5::Svg)
   set(Qt_Widgets_lib Qt5::Widgets)
   set(Qt_Xml_lib Qt5::Xml)
+  set(Qt_Test_lib Qt5::Test)
 endif()
 
 
@@ -265,7 +267,7 @@ if (WIN32 AND MSVC)
 endif()
 
 # Option to disable tests for offline/chroot builds where Boost or test deps may be missing (issue #61).
-option(BUILD_TESTS "Build unit tests (math_tests, imageproc_tests, core_tests)" ON)
+option(BUILD_TESTS "Build unit tests (math_tests, imageproc_tests, core_tests, foundation_tests, qt_tests)" ON)
 if (BUILD_TESTS)
   enable_testing()
 endif()

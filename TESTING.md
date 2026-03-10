@@ -18,6 +18,7 @@ O ejecutar cada suite por separado:
 ./foundation_tests --log_level=message
 ./math_tests --log_level=message
 ./imageproc_tests --log_level=message
+./qt_tests
 ```
 
 ## Cobertura por módulo
@@ -49,6 +50,17 @@ O ejecutar cada suite por separado:
 ### imageproc_tests
 - **BinaryImage**, **Binarize**, **Morphology**, **RasterOp**, **Scale**, **Shear**, **Transform**, etc.
 - **Dpi**: resolución (DPI) y serialización XML.
+
+### qt_tests (Qt Test)
+- **Tests de lógica (TestCoreQt)**: Units, foundation::Utils, SmartFilenameOrdering, QSignalSpy (señales y argumentos).
+- **Tests de UX (TestUxQt)**:
+  - **testButtonClickEmitsSignal**: clic en `QPushButton` emite `clicked()` (simulación con `QTest::mouseClick`).
+  - **testCheckBoxToggleChangesState**: cambio de estado con `setChecked` y señal `toggled`.
+  - **testLineEditAcceptsInput**: entrada de texto con `QTest::keyClicks` y comprobación del texto.
+  - **testCollapsibleGroupBoxStateAndSignal**: widget del proyecto: estado colapsado/expandido y señal `collapsedStateChanged`.
+  - **testErrorWidgetCreation**: creación de `ErrorWidget` y comprobación de hijos (sin mostrar ventana).
+
+Los tests de UX usan `QApplication` y pueden simular interacción (clic, teclado) sin abrir ventanas; sirven de base para ampliar con más widgets o diálogos.
 
 ## Tests de UI/UX y caminos de uso
 
