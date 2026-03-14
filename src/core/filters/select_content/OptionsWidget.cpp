@@ -243,8 +243,8 @@ void OptionsWidget::applySelection(const std::set<PageId>& pages, const bool app
     }
 
     if (applyContentBox && newParams.contentDetectionMode() == MODE_AUTO) {
-      newParams.setDependencies(Dependencies(QPolygonF(), MODE_DISABLED, newParams.pageDetectionMode(),
-                                              newParams.isFineTuningEnabled()));
+      newParams.setDependencies(
+          Dependencies(QPolygonF(), MODE_DISABLED, newParams.pageDetectionMode(), newParams.isFineTuningEnabled()));
     }
 
     m_settings->setPageParams(pageId, newParams);

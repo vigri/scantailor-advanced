@@ -4,8 +4,8 @@
 #include "ImageLoader.h"
 
 #include <QFile>
-#include <QImage>
 #include <QFileInfo>
+#include <QImage>
 #include <QtGui/QImageReader>
 
 #include "ImageId.h"

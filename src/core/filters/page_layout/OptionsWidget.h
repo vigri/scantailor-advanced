@@ -92,10 +92,10 @@ class OptionsWidget : public FilterOptionsWidget, public UnitsListener, private 
   void onFixDpiClicked();
 
   void applyMargins(const std::set<PageId>& pages,
-                   bool applyLeft = true,
-                   bool applyRight = true,
-                   bool applyTop = true,
-                   bool applyBottom = true);
+                    bool applyLeft = true,
+                    bool applyRight = true,
+                    bool applyTop = true,
+                    bool applyBottom = true);
 
   void applyAlignment(const std::set<PageId>& pages);
 

@@ -3,8 +3,8 @@
 
 #include <Constants.h>
 
-#include <cmath>
 #include <boost/test/unit_test.hpp>
+#include <cmath>
 
 BOOST_AUTO_TEST_SUITE(FoundationConstantsTestSuite)
 

@@ -100,7 +100,7 @@ void wienerFilterInPlace(GrayImage& image, QSize const& window_size, double cons
                                  + (src_pixel - mean)
                                        * (((variance - noise_variance) < 0.0) ? 0.0 : (variance - noise_variance))
                                        / variance;
-        image_line[x] = (uint8_t)((dst_pixel < 0.0) ? 0.0 : ((dst_pixel < 255.0) ? dst_pixel : 255.0));
+        image_line[x] = (uint8_t) ((dst_pixel < 0.0) ? 0.0 : ((dst_pixel < 255.0) ? dst_pixel : 255.0));
       }
     }
     image_line += image_stride;
@@ -147,7 +147,7 @@ void wienerColorFilterInPlace(QImage& image, QSize const& window_size, double co
           float origcol = image_line[indx];
           float val = origcol * colscale + coldelta;
           val = (val < 0.0f) ? 0.0f : (val < 255.0f) ? val : 255.0f;
-          image_line[indx] = (uint8_t)(val + 0.5f);
+          image_line[indx] = (uint8_t) (val + 0.5f);
         }
       }
       image_line += image_bpl;

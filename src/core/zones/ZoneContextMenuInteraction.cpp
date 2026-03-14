@@ -115,7 +115,8 @@ ZoneContextMenuInteraction::ZoneContextMenuInteraction(ZoneInteractionContext& c
   connect(m_menu.get(), SIGNAL(aboutToHide()), SLOT(menuAboutToHide()), Qt::QueuedConnection);
 
   highlightItem(0);
-  const QPoint menuPos = context.lastContextMenuScreenPos().isNull() ? QCursor::pos() : context.lastContextMenuScreenPos();
+  const QPoint menuPos
+      = context.lastContextMenuScreenPos().isNull() ? QCursor::pos() : context.lastContextMenuScreenPos();
   m_menu->popup(menuPos);  // Use event position for multi-monitor (issue #75).
 }
 

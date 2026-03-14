@@ -3,8 +3,8 @@
 
 #include "tst_core_qt.h"
 
-#include <Units.h>
 #include <SmartFilenameOrdering.h>
+#include <Units.h>
 #include <foundation/Utils.h>
 
 #include <QFileInfo>
@@ -67,4 +67,3 @@ void TestCoreQt::testSignalSpy() {
   QCOMPARE(spy.count(), 2);
   QCOMPARE(spy.at(1).at(0).toString(), QString("world"));
 }
-

@@ -6,11 +6,14 @@
 #include <cmath>
 
 #ifndef M_PI
-#  define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 ImageTransformation::ImageTransformation(const QRectF& origImageRect, const Dpi& origDpi)
-    : m_postRotation(0.0), m_postOblique(0.0), m_origRect(origImageRect), m_resultingRect(origImageRect),
+    : m_postRotation(0.0),
+      m_postOblique(0.0),
+      m_origRect(origImageRect),
+      m_resultingRect(origImageRect),
       m_origDpi(origDpi) {
   preScaleToEqualizeDpi();
 }

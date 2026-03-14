@@ -28,10 +28,7 @@ BinaryImage binarizeMokji(const QImage& src, const unsigned maxEdgeWidth, const 
  * sauvola = base * (1.0 - k * (1.0 - (frac_s + frac_d))), k = 0.30, delta = 0
  *      base = mean, frac_s = stderr / 128.0, frac_d = delta / 128.0
  */
-BinaryImage binarizeSauvola(const QImage& src,
-                            const QSize windowSize,
-                            const double k,
-                            const double delta) {
+BinaryImage binarizeSauvola(const QImage& src, const QSize windowSize, const double k, const double delta) {
   if (windowSize.isEmpty()) {
     throw std::invalid_argument("binarizeSauvola: invalid windowSize");
   }
@@ -228,7 +225,8 @@ BinaryImage binarizeWolf(const QImage& src,
 
 /*
  * fox= base * (1.0 - k * 0.5 * (1.0 - (frac_sn + frac_d))) +  min_v, k = 0.3, delta = 0
- *      base = mean - min_v, dI = origin - mean, frac_s = dI / (256 - dI), frac_sn = frac_s / max(frac_s), frac_d = delta / 128.0
+ *      base = mean - min_v, dI = origin - mean, frac_s = dI / (256 - dI), frac_sn = frac_s / max(frac_s), frac_d =
+ * delta / 128.0
  */
 BinaryImage binarizeFox(const QImage& src,
                         const QSize windowSize,
@@ -322,7 +320,7 @@ BinaryImage binarizeFox(const QImage& src,
 
       const double base = mean - minGrayLevel;
       const double frac_sn = deviation / maxDeviation;
- 
+
       const double threshold = base * (1.0 - k * 0.5 * (1.0 - (frac_sn + frac_d))) + minGrayLevel;
 
       const uint32_t msb = uint32_t(1) << 31;

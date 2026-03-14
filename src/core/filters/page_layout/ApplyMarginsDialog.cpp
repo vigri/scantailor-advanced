@@ -8,7 +8,9 @@
 #include "PageSelectionAccessor.h"
 
 namespace page_layout {
-ApplyMarginsDialog::ApplyMarginsDialog(QWidget* parent, const PageId& curPage, const PageSelectionAccessor& pageSelectionAccessor)
+ApplyMarginsDialog::ApplyMarginsDialog(QWidget* parent,
+                                       const PageId& curPage,
+                                       const PageSelectionAccessor& pageSelectionAccessor)
     : QDialog(parent),
       m_pages(pageSelectionAccessor.allPages()),
       m_selectedPages(pageSelectionAccessor.selectedPages()),

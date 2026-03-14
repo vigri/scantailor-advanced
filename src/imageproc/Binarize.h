@@ -82,11 +82,11 @@ BinaryImage binarizeWolf(const QImage& src,
  * \param upperBound The maximum possible gray level that can be made black.
  */
 BinaryImage binarizeFox(const QImage& src,
-                         QSize windowSize,
-                         unsigned char lowerBound = 1,
-                         unsigned char upperBound = 254,
-                         double k = 0.3,
-                         double delta = 0.0);
+                        QSize windowSize,
+                        unsigned char lowerBound = 1,
+                        unsigned char upperBound = 254,
+                        double k = 0.3,
+                        double delta = 0.0);
 
 /**
  * \brief Image binarization using Dynamic Window based thresholding method.
@@ -102,11 +102,11 @@ BinaryImage binarizeFox(const QImage& src,
  * \param upperBound The maximum possible gray level that can be made black.
  */
 BinaryImage binarizeWindow(const QImage& src,
-                         QSize windowSize,
-                         unsigned char lowerBound = 1,
-                         unsigned char upperBound = 254,
-                         double k = 0.33,
-                         double delta = 0.0);
+                           QSize windowSize,
+                           unsigned char lowerBound = 1,
+                           unsigned char upperBound = 254,
+                           double k = 0.33,
+                           double delta = 0.0);
 
 /**
  * \brief Image binarization using Bradley's adaptive thresholding method.

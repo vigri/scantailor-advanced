@@ -47,9 +47,8 @@ void ImageView::contextMenuEvent(QContextMenuEvent* event) {
   QAction* showGuidesAction = menu.addAction(tr("Show guides"));
   showGuidesAction->setCheckable(true);
   showGuidesAction->setChecked(ApplicationSettings::getInstance().isOutputShowGuidesEnabled());
-  connect(showGuidesAction, &QAction::toggled, [](bool checked) {
-    ApplicationSettings::getInstance().setOutputShowGuidesEnabled(checked);
-  });
+  connect(showGuidesAction, &QAction::toggled,
+          [](bool checked) { ApplicationSettings::getInstance().setOutputShowGuidesEnabled(checked); });
   menu.exec(event->globalPos());
   update();
 }

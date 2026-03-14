@@ -43,7 +43,7 @@ void OptionsWidget::appliedTo(const std::set<PageId>& pages) {
   }
 
   const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.effectiveObliqueAngle(), m_uiData.dependencies(),
-                     m_uiData.mode());
+                      m_uiData.mode());
   m_settings->setDegrees(pages, params);
 
   if (pages.size() > 1) {
@@ -61,7 +61,7 @@ void OptionsWidget::appliedToAllPages(const std::set<PageId>& pages) {
   }
 
   const Params params(m_uiData.effectiveDeskewAngle(), m_uiData.effectiveObliqueAngle(), m_uiData.dependencies(),
-                     m_uiData.mode());
+                      m_uiData.mode());
   m_settings->setDegrees(pages, params);
   emit invalidateAllThumbnails();
 }

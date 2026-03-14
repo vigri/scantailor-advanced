@@ -75,4 +75,3 @@ void TestUxQt::testErrorWidgetCreation() {
   ErrorWidget widget("Error de prueba", Qt::PlainText);
   QVERIFY(widget.findChildren<QWidget*>().size() >= 1);
 }
-

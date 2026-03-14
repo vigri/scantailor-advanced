@@ -10,8 +10,8 @@
 #include <list>
 #include <memory>
 
-#include "OptionsWidgetBinarization.h"
 #include "ColorParams.h"
+#include "OptionsWidgetBinarization.h"
 #include "Settings.h"
 #include "ui_OptionsWidgetBinarizationWolf.h"
 

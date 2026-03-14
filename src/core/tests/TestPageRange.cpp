@@ -1,12 +1,12 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <PageRange.h>
-#include <PageId.h>
 #include <ImageId.h>
+#include <PageId.h>
+#include <PageRange.h>
 
-#include <set>
 #include <boost/test/unit_test.hpp>
+#include <set>
 
 BOOST_AUTO_TEST_SUITE(CorePageRangeTestSuite)
 

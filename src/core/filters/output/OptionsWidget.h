@@ -14,7 +14,6 @@
 #include <memory>
 #include <set>
 
-#include "OptionsWidgetBinarization.h"
 #include "ColorParams.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
@@ -22,6 +21,7 @@
 #include "Dpi.h"
 #include "FilterOptionsWidget.h"
 #include "ImageViewTab.h"
+#include "OptionsWidgetBinarization.h"
 #include "OutputProcessingParams.h"
 #include "PageId.h"
 #include "PageSelectionAccessor.h"

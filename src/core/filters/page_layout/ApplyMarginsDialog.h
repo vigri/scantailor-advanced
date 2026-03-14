@@ -25,11 +25,7 @@ class ApplyMarginsDialog : public QDialog, private Ui::ApplyMarginsDialog {
 
  signals:
 
-  void accepted(const std::set<PageId>& pages,
-                bool applyLeft,
-                bool applyRight,
-                bool applyTop,
-                bool applyBottom);
+  void accepted(const std::set<PageId>& pages, bool applyLeft, bool applyRight, bool applyTop, bool applyBottom);
 
  private slots:
 
