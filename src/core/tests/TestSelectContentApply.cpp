@@ -44,5 +44,23 @@ BOOST_AUTO_TEST_CASE(same_mode_auto_no_content_box_update) {
   BOOST_CHECK(!needUpdatePageBox);
 }
 
+BOOST_AUTO_TEST_CASE(different_outlines_force_content_box_update) {
+  QPolygonF outlineA;
+  outlineA << QPointF(0, 0) << QPointF(100, 0) << QPointF(100, 150) << QPointF(0, 150);
+  QPolygonF outlineB;
+  outlineB << QPointF(0, 0) << QPointF(120, 0) << QPointF(120, 150) << QPointF(0, 150);
+
+  Dependencies currentDeps(outlineA, MODE_AUTO, MODE_DISABLED, false);
+  Dependencies storedDeps(outlineB, MODE_AUTO, MODE_DISABLED, false);
+
+  bool needUpdateContentBox = false;
+  bool needUpdatePageBox = false;
+  currentDeps.compatibleWith(storedDeps, &needUpdateContentBox, &needUpdatePageBox);
+
+  BOOST_REQUIRE_MESSAGE(needUpdateContentBox,
+                        "When outlines differ, needUpdateContentBox must be true (PR #108 review).");
+  BOOST_CHECK(needUpdatePageBox);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 }  // namespace Tests
