@@ -1,5 +1,8 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
+//
+// Split Params (Issue #1): refactor into RotationParams and ObliqueParams as requested by Zvezdochiot;
+// in the dev branch this is implemented (single <params> XML preserved for compatibility).
 
 #ifndef SCANTAILOR_DESKEW_PARAMS_H_
 #define SCANTAILOR_DESKEW_PARAMS_H_
