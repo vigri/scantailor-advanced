@@ -26,6 +26,7 @@
 #include "FilterData.h"
 #include "FilterUiInterface.h"
 #include "ImageView.h"
+#include "ObliqueFinder.h"
 #include "OptionsWidget.h"
 #include "TaskStatus.h"
 #include "filters/select_content/Task.h"
@@ -138,6 +139,11 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
         uiData.setEffectiveDeskewAngle(0);
       }
       uiData.setMode(MODE_AUTO);
+
+      const std::optional<double> obliqueDeg = findObliqueDegrees(rotatedImage, skewFinder, 5.0);
+      if (obliqueDeg) {
+        uiData.setEffectiveObliqueAngle(-*obliqueDeg);
+      }
 
       Params newParams(uiData.effectiveDeskewAngle(), uiData.effectiveObliqueAngle(), deps, uiData.mode());
       m_settings->setPageParams(m_pageId, newParams);

@@ -15,6 +15,18 @@ class QDomDocument;
 class QDomElement;
 
 namespace deskew {
+
+/** Rotation (deskew) angle and auto/manual mode. */
+struct RotationParams {
+  double angle = 0.0;
+  AutoManualMode mode = MODE_AUTO;
+};
+
+/** Oblique (shear) angle in degrees. */
+struct ObliqueParams {
+  double obliqueAngle = 0.0;
+};
+
 class Params {
  public:
   // Member-wise copying is OK.
@@ -38,19 +50,18 @@ class Params {
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
  private:
-  double m_deskewAngleDeg;
-  double m_obliqueDeg;
+  RotationParams m_rotation;
+  ObliqueParams m_oblique;
   Dependencies m_deps;
-  AutoManualMode m_mode;
 };
 
 
 inline double Params::deskewAngle() const {
-  return m_deskewAngleDeg;
+  return m_rotation.angle;
 }
 
 inline double Params::obliqueAngle() const {
-  return m_obliqueDeg;
+  return m_oblique.obliqueAngle;
 }
 
 inline const Dependencies& Params::dependencies() const {
@@ -58,7 +69,7 @@ inline const Dependencies& Params::dependencies() const {
 }
 
 inline AutoManualMode Params::mode() const {
-  return m_mode;
+  return m_rotation.mode;
 }
 }  // namespace deskew
 
