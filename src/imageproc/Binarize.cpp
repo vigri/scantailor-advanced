@@ -395,9 +395,10 @@ BinaryImage binarizeWindow(const QImage& src,
 
   const int areaFull = w * h;
   assert(areaFull > 0);
-  const double meanFull = (double) integralImage.sum(QRect(0, 0, w, h)) / areaFull;
+  const uint64_t meanFull = integralImage.sum(QRect(0, 0, w, h)) / areaFull;
   double deviationMax = 0.0;
   double deviationMin = 256.0;
+  const double coefw = k * 3.0; // translate from Wolf to Window coef.
 
   grayLine = gray.bits();
   for (int y = 0; y < h; ++y) {
@@ -416,8 +417,8 @@ BinaryImage binarizeWindow(const QImage& src,
       const double mean = windowSum * rArea;
       const double sqmean = windowSqsum * rArea;
 
-      const double variance = sqmean - mean * mean;
-      const double deviation = std::sqrt(std::fabs(variance));
+      const double variance = std::fabs(sqmean - mean * mean);
+      const double deviation = std::sqrt(variance);
 
       deviationMax = (deviation > deviationMax) ? deviation : deviationMax;
       deviationMin = (deviation < deviationMin) ? deviation : deviationMin;
@@ -425,12 +426,13 @@ BinaryImage binarizeWindow(const QImage& src,
     grayLine += grayBpl;
   }
 
-  const double deviationD = (deviationMax > deviationMin) ? (deviationMax - deviationMin) : 1.0;
+  const double deviationD = deviationMax - deviationMin;
 
   BinaryImage bwImg(w, h);
   uint32_t* bwLine = bwImg.data();
   const int bwWpl = bwImg.wordsPerLine();
 
+  const uint32_t msb = uint32_t(1) << 31;
   grayLine = gray.bits();
   for (int y = 0; y < h; ++y) {
     const int top = (y > windowLowerHalf) ? (y - windowLowerHalf) : 0;
@@ -448,17 +450,16 @@ BinaryImage binarizeWindow(const QImage& src,
       const double mean = windowSum * rArea;
       const double sqmean = windowSqsum * rArea;
 
-      const double variance = sqmean - mean * mean;
-      const double deviation = std::sqrt(std::fabs(variance));
+      const double variance = std::fabs(sqmean - mean * mean);
+      const double deviation = std::sqrt(variance);
 
       const double md = (mean + 1.0 - delta) / (meanFull + deviation + 1.0);
       const double kdm = (meanFull + meanFull + 1.0) / (deviation + 1.0);
-      const double kds = (deviation - deviationMin) / deviationD;
+      const double kds = (deviationD > 0.0) ? ((deviation - deviationMin) / deviationD) : 1.0;
       const double kd = 1.0 + kdm * kds;
 
-      const double threshold = mean * (1.0 - k * 3.0 * md / kd);
+      const double threshold = mean * (1.0 - coefw * md / kd);
 
-      const uint32_t msb = uint32_t(1) << 31;
       const uint32_t mask = msb >> (x & 31);
       if ((grayLine[x] < lowerBound) || ((grayLine[x] <= upperBound) && (int(grayLine[x]) < threshold))) {
         // black
