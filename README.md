@@ -68,6 +68,12 @@ and assembling multi-page documents are out of scope of this project.
 
 Go to [this repository](https://github.com/ScanTailor-Advanced/scantailor-libs-build) and follow the instructions given there.
 
+**Windows – large JPEG/PNG (issue #20):** If large-format JPEG or PNG files fail to load on Windows, ensure the build uses **libjpeg-turbo** (or libjpeg 9+) and a recent libpng. The [scantailor-libs-build](https://github.com/ScanTailor-Advanced/scantailor-libs-build) repository provides compatible libraries.
+
+**Linux – Wayland (issue #97):** If you see rendering issues (blank or corrupted windows) when running under Wayland, try starting the application with `QT_QPA_PLATFORM=xcb` to use the X11 compatibility layer.
+
+**Linux – Flatpak / Flathub (issue #105):** A Flatpak manifest is provided in `flatpak/org.scantailor.Advanced.json`. To build locally: `flatpak-builder --user --force-clean build flatpak/org.scantailor.Advanced.json` (requires `flatpak` and `flatpak-builder`). To publish on Flathub, use a distinct application ID (e.g. `org.scantailor.Advanced`) so it does not conflict with the original ScanTailor package.
+
 ## About this fork
 
 Unfortunately, the [repository](https://github.com/4lex4/scantailor-advanced/releases) of @4lex4 seems to be no longer active.
@@ -418,3 +424,58 @@ has't been moved due to dirty realization. Their functionality is fully covered 
 ## License
 
 This software is licensed under GNU GPLv3, you can read more about it on our [LICENSE](/LICENSE) file.
+
+## Building (detailed)
+
+#### Building on Linux (Ubuntu / Debian)
+
+Install the required dependencies:
+
+```bash
+sudo apt install build-essential cmake \
+  qt5-qmake qtbase5-dev libqt5svg5-dev qttools5-dev \
+  libboost-test-dev libboost-dev \
+  libjpeg-dev libpng-dev libtiff-dev zlib1g-dev
+```
+
+Configure and build (out-of-tree build is required):
+
+```bash
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+```
+
+For **offline or minimal chroot** builds where unit tests cannot be built (issue #61), use `cmake -DBUILD_TESTS=OFF ..` to skip the test targets.
+
+The executable will be in the `build` directory. To install system-wide: `sudo make install`.
+
+To build a `.deb` package (with application icon and menu entry):
+
+```bash
+./build-deb.sh
+```
+
+This compiles the project and produces `scantailor-advanced_<version>_<arch>.deb` in the project root. Install with `sudo dpkg -i scantailor-advanced_*.deb`.
+
+#### Building a Windows .exe from Linux (cross-compile)
+
+You can cross-compile the Windows executable from Linux using [MXE](https://mxe.cc/) (M Cross Environment). One-time MXE setup (builds Qt5 and dependencies; can take 1–2 hours):
+
+```bash
+git clone https://github.com/mxe/mxe.git ~/mxe
+cd ~/mxe
+make MXE_TARGETS=x86_64-w64-mingw32.static qt5 jpeg libpng tiff zlib boost
+```
+
+Then from the ScanTailor Advanced source directory:
+
+```bash
+./build-windows.sh
+```
+
+This produces `build-win-static/scantailor.exe`. Use `./build-windows.sh shared` for a smaller build that requires shipping DLLs from MXE’s `usr/x86_64-w64-mingw32.shared/bin/` alongside the .exe.
+
+#### Building on Windows (native)
+
+Go to [this repository](https://github.com/4lex4/scantailor-libs-build) and follow the instructions given there.

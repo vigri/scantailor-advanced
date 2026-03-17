@@ -62,6 +62,53 @@ BinaryImage binarizeWolf(const QImage& src,
                          double delta = 0.0);
 
 /**
+ * \brief Image binarization using Fox's local thresholding method.
+ *
+ * Modification of the Wolf threshold using the Singh optimization
+ * of the Sauvola threshold.
+ *
+ * C. Wolf, J.M. Jolion, F. Chassaing. "Text localization, enhancement and
+ * binarization in multimedia documents."
+ * http://liris.cnrs.fr/christian.wolf/papers/icpr2002v.pdf
+ *
+ * Singh, O. I., Sinam, T., James, O., & Singh, T. R. (2012).
+ * Local contrast and mean based thresholding technique in image binarization.
+ * International Journal of Computer Applications, 51, 5-10.
+ * https://research.ijcaonline.org/volume51/number6/pxc3881362.pdf
+ *
+ * \param src The image to binarize.
+ * \param windowSize The dimensions of a pixel neighborhood to consider.
+ * \param lowerBound The minimum possible gray level that can be made white.
+ * \param upperBound The maximum possible gray level that can be made black.
+ */
+BinaryImage binarizeFox(const QImage& src,
+                        QSize windowSize,
+                        unsigned char lowerBound = 1,
+                        unsigned char upperBound = 254,
+                        double k = 0.3,
+                        double delta = 0.0);
+
+/**
+ * \brief Image binarization using Dynamic Window based thresholding method.
+ *
+ * Bataineh, B., Abdullah, S. N. H. S., & Omar, K. (2011).
+ * An adaptive local binarization method for document images based
+ * on a novel thresholding method and  dynamic windows.
+ * Pattern Recognition Letters, 32(14), 1805–1813.
+ *
+ * \param src The image to binarize.
+ * \param windowSize The dimensions of a pixel neighborhood to consider.
+ * \param lowerBound The minimum possible gray level that can be made white.
+ * \param upperBound The maximum possible gray level that can be made black.
+ */
+BinaryImage binarizeWindow(const QImage& src,
+                           QSize windowSize,
+                           unsigned char lowerBound = 1,
+                           unsigned char upperBound = 254,
+                           double k = 0.33,
+                           double delta = 0.0);
+
+/**
  * \brief Image binarization using Bradley's adaptive thresholding method.
  *
  * Derek Bradley, Gerhard Roth. 2005. "Adaptive Thresholding Using the Integral Image".

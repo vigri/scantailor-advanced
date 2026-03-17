@@ -275,6 +275,25 @@ QRectF ImageViewBase::getOccupiedWidgetRect() const {
   return widgetRect.intersected(dynamicViewportRect());
 }
 
+QImage ImageViewBase::sampleImageAtWidgetRect(const QRect& widgetRect, const int maxImageSide) const {
+  if (m_image.isNull() || widgetRect.isEmpty()) {
+    return QImage();
+  }
+  const QPointF widgetCenter(widgetRect.center());
+  const QPointF imagePoint(widgetToImage().map(widgetCenter));
+  const int ix = qRound(imagePoint.x());
+  const int iy = qRound(imagePoint.y());
+  const int half = maxImageSide / 2;
+  const int x1 = qBound(0, ix - half, m_image.width());
+  const int y1 = qBound(0, iy - half, m_image.height());
+  const int x2 = qBound(0, ix + half, m_image.width());
+  const int y2 = qBound(0, iy + half, m_image.height());
+  if (x2 <= x1 || y2 <= y1) {
+    return QImage();
+  }
+  return m_image.copy(x1, y1, x2 - x1, y2 - y1);
+}
+
 void ImageViewBase::setWidgetFocalPoint(const QPointF& widgetFp) {
   setNewWidgetFP(widgetFp, /*update =*/true);
 }

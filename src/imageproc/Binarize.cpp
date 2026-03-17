@@ -25,12 +25,10 @@ BinaryImage binarizeMokji(const QImage& src, const unsigned maxEdgeWidth, const 
 /*
  * sauvola = mean * (1.0 + k * (stderr / 128.0 - 1.0)), k = 0.34
  * modification by zvezdochiot:
- * sauvola = mean * (1.0 + k * ((stderr + delta) / 128.0 - 1.0)), k = 0.34, delta = 0
+ * sauvola = base * (1.0 - k * (1.0 - (frac_s + frac_d))), k = 0.30, delta = 0
+ *      base = mean, frac_s = stderr / 128.0, frac_d = delta / 128.0
  */
-BinaryImage binarizeSauvola(const QImage& src,
-                            const QSize windowSize,
-                            const double k,
-                            const double delta) {
+BinaryImage binarizeSauvola(const QImage& src, const QSize windowSize, const double k, const double delta) {
   if (windowSize.isEmpty()) {
     throw std::invalid_argument("binarizeSauvola: invalid windowSize");
   }
@@ -72,6 +70,7 @@ BinaryImage binarizeSauvola(const QImage& src,
   uint32_t* bwLine = bwImg.data();
   const int bwWpl = bwImg.wordsPerLine();
 
+  const double frac_d = (double) delta / 128.0;
   grayLine = gray.bits();
   for (int y = 0; y < h; ++y) {
     const int top = std::max(0, y - windowLowerHalf);
@@ -91,8 +90,9 @@ BinaryImage binarizeSauvola(const QImage& src,
 
       const double variance = sqmean - mean * mean;
       const double deviation = std::sqrt(std::fabs(variance));
+      const double frac_s = deviation / 128.0;
 
-      const double threshold = mean * (1.0 + k * ((deviation + delta) / 128.0 - 1.0));
+      const double threshold = mean * (1.0 - k * (1.0 - (frac_s + frac_d)));
 
       const uint32_t msb = uint32_t(1) << 31;
       const uint32_t mask = msb >> (x & 31);
@@ -113,7 +113,8 @@ BinaryImage binarizeSauvola(const QImage& src,
 /*
  * wolf = mean - k * (mean - min_v) * (1.0 - stderr / stdmax), k = 0.3
  * modification by zvezdochiot:
- * wolf = mean - k * (mean - min_v) * (1.0 - (stderr / stdmax + delta / 128.0), k = 0.3, delta = 0
+ * wolf = base * (1.0 - k * (1.0 - (frac_sn + frac_d))) + min_v, k = 0.3, delta = 0
+ *      base = mean - min_v, frac_sn = stderr / stdmax, frac_d = delta / 128.0
  */
 BinaryImage binarizeWolf(const QImage& src,
                          const QSize windowSize,
@@ -196,13 +197,15 @@ BinaryImage binarizeWolf(const QImage& src,
   uint32_t* bwLine = bwImg.data();
   const int bwWpl = bwImg.wordsPerLine();
 
+  const double frac_d = (double) delta / 128.0;
   grayLine = gray.bits();
   for (int y = 0; y < h; ++y) {
     for (int x = 0; x < w; ++x) {
       const float mean = means[y * w + x];
       const float deviation = deviations[y * w + x];
-      const double a = 1.0 - (deviation / maxDeviation + (double) delta / 128.0);
-      const double threshold = mean - k * a * (mean - minGrayLevel);
+      const double base = mean - minGrayLevel;
+      const double frac_sn = deviation / maxDeviation;
+      const double threshold = base * (1.0 - k * (1.0 - (frac_sn + frac_d))) + minGrayLevel;
 
       const uint32_t msb = uint32_t(1) << 31;
       const uint32_t mask = msb >> (x & 31);
@@ -220,6 +223,260 @@ BinaryImage binarizeWolf(const QImage& src,
   return bwImg;
 }  // binarizeWolf
 
+/*
+ * fox= base * (1.0 - k * 0.5 * (1.0 - (frac_sn + frac_d))) +  min_v, k = 0.3, delta = 0
+ *      base = mean - min_v, dI = origin - mean, frac_s = dI / (256 - dI), frac_sn = frac_s / max(frac_s), frac_d =
+ * delta / 128.0
+ */
+BinaryImage binarizeFox(const QImage& src,
+                        const QSize windowSize,
+                        const unsigned char lowerBound,
+                        const unsigned char upperBound,
+                        const double k,
+                        const double delta) {
+  if (windowSize.isEmpty()) {
+    throw std::invalid_argument("binarizeFox: invalid windowSize");
+  }
+
+  if (src.isNull()) {
+    return BinaryImage();
+  }
+
+  const QImage gray(toGrayscale(src));
+  if (gray.isNull()) {
+    return BinaryImage();
+  }
+  const int w = gray.width();
+  const int h = gray.height();
+
+  IntegralImage<uint32_t> integralImage(w, h);
+
+  const uint8_t* grayLine = gray.bits();
+  const int grayBpl = gray.bytesPerLine();
+
+  uint32_t minGrayLevel = 255;
+
+  for (int y = 0; y < h; ++y) {
+    integralImage.beginRow();
+    for (int x = 0; x < w; ++x) {
+      const uint32_t pixel = grayLine[x];
+      integralImage.push(pixel);
+      minGrayLevel = (pixel < minGrayLevel) ? pixel : minGrayLevel;
+    }
+    grayLine += grayBpl;
+  }
+
+  const int windowLowerHalf = windowSize.height() >> 1;
+  const int windowUpperHalf = windowSize.height() - windowLowerHalf;
+  const int windowLeftHalf = windowSize.width() >> 1;
+  const int windowRightHalf = windowSize.width() - windowLeftHalf;
+
+  double maxDeviation = 0.0;
+
+  grayLine = gray.bits();
+  for (int y = 0; y < h; ++y) {
+    const int top = (y > windowLowerHalf) ? (y - windowLowerHalf) : 0;
+    const int bottom = ((y + windowUpperHalf) < h) ? (y + windowUpperHalf) : h;
+    for (int x = 0; x < w; ++x) {
+      const int left = (x > windowLeftHalf) ? (x - windowLeftHalf) : 0;
+      const int right = ((x + windowRightHalf) < w) ? (x + windowRightHalf) : w;
+      const int area = (bottom - top) * (right - left);
+      assert(area > 0);  // because windowSize > 0 and w > 0 and h > 0
+      const QRect rect(left, top, right - left, bottom - top);
+      const double windowSum = integralImage.sum(rect);
+
+      const double rArea = 1.0 / area;
+      const double mean = windowSum * rArea;
+      const double di = (double) grayLine[x] - mean;
+      const double deviation = di / (256.0 - di);
+
+      maxDeviation = (deviation > maxDeviation) ? deviation : maxDeviation;
+    }
+    grayLine += grayBpl;
+  }
+  maxDeviation = (maxDeviation > 0.0) ? maxDeviation : 1.0;
+
+  BinaryImage bwImg(w, h);
+  uint32_t* bwLine = bwImg.data();
+  const int bwWpl = bwImg.wordsPerLine();
+
+  const double frac_d = (double) delta / 128.0;
+  grayLine = gray.bits();
+  for (int y = 0; y < h; ++y) {
+    const int top = (y > windowLowerHalf) ? (y - windowLowerHalf) : 0;
+    const int bottom = ((y + windowUpperHalf) < h) ? (y + windowUpperHalf) : h;
+    for (int x = 0; x < w; ++x) {
+      const int left = (x > windowLeftHalf) ? (x - windowLeftHalf) : 0;
+      const int right = ((x + windowRightHalf) < w) ? (x + windowRightHalf) : w;
+      const int area = (bottom - top) * (right - left);
+      assert(area > 0);  // because windowSize > 0 and w > 0 and h > 0
+      const QRect rect(left, top, right - left, bottom - top);
+      const double windowSum = integralImage.sum(rect);
+
+      const double rArea = 1.0 / area;
+      const double mean = windowSum * rArea;
+      const double di = (double) grayLine[x] - mean;
+      const double deviation = di / (256.0 - di);
+
+      const double base = mean - minGrayLevel;
+      const double frac_sn = deviation / maxDeviation;
+
+      const double threshold = base * (1.0 - k * 0.5 * (1.0 - (frac_sn + frac_d))) + minGrayLevel;
+
+      const uint32_t msb = uint32_t(1) << 31;
+      const uint32_t mask = msb >> (x & 31);
+      if ((grayLine[x] < lowerBound) || ((grayLine[x] <= upperBound) && (int(grayLine[x]) < threshold))) {
+        // black
+        bwLine[x >> 5] |= mask;
+      } else {
+        // white
+        bwLine[x >> 5] &= ~mask;
+      }
+    }
+    grayLine += grayBpl;
+    bwLine += bwWpl;
+  }
+  return bwImg;
+}  // binarizeFox
+
+/*
+ * window = mean * (1 - k * md / kd), k = 1.0
+ * where:
+ * md = (mean + 1) / (meanFull + deviation + 1)
+ * kd = 1 + kdm * kds
+ * kdm = (2 * meanFull + 1) / (deviation + 1)
+ * deviationD = deviationMax - deviationMin
+ * kds = (deviation - deviationMin) / deviationD if deviationD > 0, 1 if other
+ * modification by zvezdochiot:
+ * md = (mean + 1 - delta) / (meanFull + deviation + 1), delta = 0
+ */
+BinaryImage binarizeWindow(const QImage& src,
+                           const QSize windowSize,
+                           const unsigned char lowerBound,
+                           const unsigned char upperBound,
+                           const double k,
+                           const double delta) {
+  if (windowSize.isEmpty()) {
+    throw std::invalid_argument("binarizeWindow: invalid windowSize");
+  }
+
+  if (src.isNull()) {
+    return BinaryImage();
+  }
+
+  const QImage gray(toGrayscale(src));
+  if (gray.isNull()) {
+    return BinaryImage();
+  }
+  const int w = gray.width();
+  const int h = gray.height();
+
+  IntegralImage<uint32_t> integralImage(w, h);
+  IntegralImage<uint64_t> integralSqimage(w, h);
+
+  const uint8_t* grayLine = gray.bits();
+  const int grayBpl = gray.bytesPerLine();
+
+  for (int y = 0; y < h; ++y) {
+    integralImage.beginRow();
+    integralSqimage.beginRow();
+    for (int x = 0; x < w; ++x) {
+      const uint32_t pixel = grayLine[x];
+      integralImage.push(pixel);
+      integralSqimage.push(pixel * pixel);
+    }
+    grayLine += grayBpl;
+  }
+
+  const int windowLowerHalf = windowSize.height() >> 1;
+  const int windowUpperHalf = windowSize.height() - windowLowerHalf;
+  const int windowLeftHalf = windowSize.width() >> 1;
+  const int windowRightHalf = windowSize.width() - windowLeftHalf;
+
+  const int areaFull = w * h;
+  assert(areaFull > 0);
+  const double meanFull = (double) integralImage.sum(QRect(0, 0, w, h)) / areaFull;
+  double deviationMax = 0.0;
+  double deviationMin = 256.0;
+
+  grayLine = gray.bits();
+  for (int y = 0; y < h; ++y) {
+    const int top = (y > windowLowerHalf) ? (y - windowLowerHalf) : 0;
+    const int bottom = ((y + windowUpperHalf) < h) ? (y + windowUpperHalf) : h;
+    for (int x = 0; x < w; ++x) {
+      const int left = (x > windowLeftHalf) ? (x - windowLeftHalf) : 0;
+      const int right = ((x + windowRightHalf) < w) ? (x + windowRightHalf) : w;
+      const int area = (bottom - top) * (right - left);
+      assert(area > 0);  // because windowSize > 0 and w > 0 and h > 0
+      const QRect rect(left, top, right - left, bottom - top);
+      const double windowSum = integralImage.sum(rect);
+      const double windowSqsum = integralSqimage.sum(rect);
+
+      const double rArea = 1.0 / area;
+      const double mean = windowSum * rArea;
+      const double sqmean = windowSqsum * rArea;
+
+      const double variance = sqmean - mean * mean;
+      const double deviation = std::sqrt(std::fabs(variance));
+
+      deviationMax = (deviation > deviationMax) ? deviation : deviationMax;
+      deviationMin = (deviation < deviationMin) ? deviation : deviationMin;
+    }
+    grayLine += grayBpl;
+  }
+
+  const double deviationD = (deviationMax > deviationMin) ? (deviationMax - deviationMin) : 1.0;
+
+  BinaryImage bwImg(w, h);
+  uint32_t* bwLine = bwImg.data();
+  const int bwWpl = bwImg.wordsPerLine();
+
+  grayLine = gray.bits();
+  for (int y = 0; y < h; ++y) {
+    const int top = (y > windowLowerHalf) ? (y - windowLowerHalf) : 0;
+    const int bottom = ((y + windowUpperHalf) < h) ? (y + windowUpperHalf) : h;
+    for (int x = 0; x < w; ++x) {
+      const int left = (x > windowLeftHalf) ? (x - windowLeftHalf) : 0;
+      const int right = ((x + windowRightHalf) < w) ? (x + windowRightHalf) : w;
+      const int area = (bottom - top) * (right - left);
+      assert(area > 0);  // because windowSize > 0 and w > 0 and h > 0
+      const QRect rect(left, top, right - left, bottom - top);
+      const double windowSum = integralImage.sum(rect);
+      const double windowSqsum = integralSqimage.sum(rect);
+
+      const double rArea = 1.0 / area;
+      const double mean = windowSum * rArea;
+      const double sqmean = windowSqsum * rArea;
+
+      const double variance = sqmean - mean * mean;
+      const double deviation = std::sqrt(std::fabs(variance));
+
+      const double md = (mean + 1.0 - delta) / (meanFull + deviation + 1.0);
+      const double kdm = (meanFull + meanFull + 1.0) / (deviation + 1.0);
+      const double kds = (deviation - deviationMin) / deviationD;
+      const double kd = 1.0 + kdm * kds;
+
+      const double threshold = mean * (1.0 - k * 3.0 * md / kd);
+
+      const uint32_t msb = uint32_t(1) << 31;
+      const uint32_t mask = msb >> (x & 31);
+      if ((grayLine[x] < lowerBound) || ((grayLine[x] <= upperBound) && (int(grayLine[x]) < threshold))) {
+        // black
+        bwLine[x >> 5] |= mask;
+      } else {
+        // white
+        bwLine[x >> 5] &= ~mask;
+      }
+    }
+    grayLine += grayBpl;
+    bwLine += bwWpl;
+  }
+  return bwImg;
+}  // binarizeWindow
+
+/*
+ * bradlay = mean * (1 - k) + delta, k = 0.34, delta = 0
+ */
 BinaryImage binarizeBradley(const QImage& src, const QSize windowSize, const double k, const double delta) {
   if (windowSize.isEmpty()) {
     throw std::invalid_argument("binarizeBradley: invalid windowSize");

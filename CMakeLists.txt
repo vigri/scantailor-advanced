@@ -193,13 +193,13 @@ if (WIN32)
 endif()
 set(Boost_USE_MULTITHREADED ON)
 
-find_package(Boost 1.60 COMPONENTS unit_test_framework prg_exec_monitor REQUIRED)
+find_package(Boost 1.60 COMPONENTS unit_test_framework REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION)
 if (NOT Boost_USE_STATIC_LIBS)
   if (WIN32)
-    add_dynamic_library_locations(Boost::unit_test_framework Boost::prg_exec_monitor)
+    add_dynamic_library_locations(Boost::unit_test_framework)
   endif()
   add_definitions(-DBOOST_TEST_DYN_LINK)
 endif()
@@ -210,13 +210,13 @@ set(qt_min_version 5.9)
 
 find_package(
     Qt6
-    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg OpenGLWidgets
+    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg OpenGLWidgets Test
     CONFIG)
 if (Qt6_FOUND)
     set(QT_BINDIR "${QT6_INSTALL_PREFIX}/bin")
 else()
   find_package(Qt5 ${qt_min_version}
-    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg
+    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg Test
     CONFIG REQUIRED)
     set(QT_BINDIR "${QT5_INSTALL_PREFIX}/bin")
 endif()
@@ -230,6 +230,7 @@ if(Qt6_FOUND)
   set(Qt_Widgets_lib Qt::Widgets)
   set(Qt_Xml_lib Qt::Xml)
   set(Qt_OpenGLWidgets_lib Qt::OpenGLWidgets)
+  set(Qt_Test_lib Qt::Test)
 else()
   set(Qt_Core_lib Qt5::Core)
   set(Qt_Gui_lib Qt5::Gui)
@@ -238,6 +239,7 @@ else()
   set(Qt_Svg_lib Qt5::Svg)
   set(Qt_Widgets_lib Qt5::Widgets)
   set(Qt_Xml_lib Qt5::Xml)
+  set(Qt_Test_lib Qt5::Test)
 endif()
 
 
@@ -264,7 +266,11 @@ if (WIN32 AND MSVC)
   add_definitions(-DNOMINMAX)
 endif()
 
-enable_testing()
+# Option to disable tests for offline/chroot builds where Boost or test deps may be missing (issue #61).
+option(BUILD_TESTS "Build unit tests (math_tests, imageproc_tests, core_tests, foundation_tests, qt_tests)" ON)
+if (BUILD_TESTS)
+  enable_testing()
+endif()
 
 # Prepare config.h
 option(PORTABLE_VERSION "Whether to build the portable version." ON)
@@ -316,6 +322,11 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1" APPLICATION_VERSION_PATC
 
 set(SCANTAILOR_RESOURCES_DIR "${CMAKE_SOURCE_DIR}/src/resources")
 set(SCANTAILOR_TRANSLATIONS_DIR "${CMAKE_SOURCE_DIR}/src/translations")
+
+configure_file(
+    "${SCANTAILOR_RESOURCES_DIR}/unix/scantailor.desktop.in"
+    "${CMAKE_BINARY_DIR}/scantailor.desktop"
+    @ONLY)
 
 add_subdirectory(src)
 
@@ -441,7 +452,7 @@ if (WIN32)
 endif()
 
 if (UNIX)
-  install(FILES "${SCANTAILOR_RESOURCES_DIR}/unix/scantailor.desktop"
+  install(FILES "${CMAKE_BINARY_DIR}/scantailor.desktop"
       DESTINATION "share/applications")
   install(FILES "${SCANTAILOR_RESOURCES_DIR}/appicon.svg"
       DESTINATION "share/icons/hicolor/scalable/apps"

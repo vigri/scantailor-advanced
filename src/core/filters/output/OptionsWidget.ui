@@ -1344,10 +1344,10 @@
         <item>
          <widget class="QSlider" name="despeckleSlider">
           <property name="minimum">
-           <number>10</number>
+           <number>5</number>
           </property>
           <property name="maximum">
-           <number>30</number>
+           <number>35</number>
           </property>
           <property name="singleStep">
            <number>2</number>

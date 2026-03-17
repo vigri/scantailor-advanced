@@ -560,23 +560,35 @@ void BinaryImageXOR(BinaryImage& image, const BinaryImage& bwMask, const BWColor
   }
 }
 
+namespace {
+// Clip content polygon to image rect to avoid exception when dewarp pushes content outside (issue #30).
+QPolygonF clipContentPolyToRect(const QPolygonF& contentPoly, const QRect& imageRect) {
+  const QRectF r(imageRect);
+  QPolygonF rectPoly;
+  rectPoly << r.topLeft() << r.topRight() << r.bottomRight() << r.bottomLeft();
+  return contentPoly.intersected(rectPoly);
+}
+}  // namespace
+
 void fillMarginsInPlace(QImage& image,
                         const QPolygonF& contentPoly,
                         const QColor& color,
                         const bool antialiasing = true) {
-  if (contentPoly.intersected(QRectF(image.rect())) != contentPoly) {
-    throw std::invalid_argument("fillMarginsInPlace: the content area exceeds image rect.");
+  const QRect imageRect = image.rect();
+  QPolygonF clipped = clipContentPolyToRect(contentPoly, imageRect);
+  if (clipped.isEmpty() || clipped.boundingRect().isEmpty()) {
+    image.fill(color);
+    return;
   }
 
   if ((image.format() == QImage::Format_Mono) || (image.format() == QImage::Format_MonoLSB)) {
     BinaryImage binaryImage(image);
-    PolygonRasterizer::fillExcept(binaryImage, (color == Qt::black) ? BLACK : WHITE, contentPoly, Qt::WindingFill);
+    PolygonRasterizer::fillExcept(binaryImage, (color == Qt::black) ? BLACK : WHITE, clipped, Qt::WindingFill);
     image = binaryImage.toQImage();
     return;
   }
   if ((image.format() == QImage::Format_Indexed8) && image.isGrayscale()) {
-    PolygonRasterizer::grayFillExcept(image, static_cast<unsigned char>(qGray(color.rgb())), contentPoly,
-                                      Qt::WindingFill);
+    PolygonRasterizer::grayFillExcept(image, static_cast<unsigned char>(qGray(color.rgb())), clipped, Qt::WindingFill);
     return;
   }
 
@@ -593,7 +605,7 @@ void fillMarginsInPlace(QImage& image,
     QPainterPath outerPath;
     outerPath.addRect(image.rect());
     QPainterPath innerPath;
-    innerPath.addPolygon(PolygonUtils::round(contentPoly));
+    innerPath.addPolygon(PolygonUtils::round(clipped));
 
     painter.drawPath(outerPath.subtracted(innerPath));
   }
@@ -601,11 +613,14 @@ void fillMarginsInPlace(QImage& image,
 }
 
 void fillMarginsInPlace(BinaryImage& image, const QPolygonF& contentPoly, const BWColor color) {
-  if (contentPoly.intersected(QRectF(image.rect())) != contentPoly) {
-    throw std::invalid_argument("fillMarginsInPlace: the content area exceeds image rect.");
+  const QRect imageRect = image.rect();
+  QPolygonF clipped = clipContentPolyToRect(contentPoly, imageRect);
+  if (clipped.isEmpty() || clipped.boundingRect().isEmpty()) {
+    image.fill(color == BLACK ? BLACK : WHITE);
+    return;
   }
 
-  PolygonRasterizer::fillExcept(image, color, contentPoly, Qt::WindingFill);
+  PolygonRasterizer::fillExcept(image, color, clipped, Qt::WindingFill);
 }
 
 void fillMarginsInPlace(BinaryImage& image, const BinaryImage& contentMask, const BWColor color) {
@@ -775,7 +790,7 @@ const int MultiplyDeBruijnBitPosition2[32] = {0, 9,  1,  10, 13, 21, 2,  29, 11,
  * https://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup
  */
 inline int countConsecutiveZeroBitsTrailing(uint32_t v) {
-  return MultiplyDeBruijnBitPosition[((uint32_t)((v & -signed(v)) * 0x077CB531U)) >> 27];
+  return MultiplyDeBruijnBitPosition[((uint32_t) ((v & -signed(v)) * 0x077CB531U)) >> 27];
 }
 
 /**
@@ -790,7 +805,7 @@ inline int findPositionOfTheHighestBitSet(uint32_t v) {
   v |= v >> 4;
   v |= v >> 8;
   v |= v >> 16;
-  return MultiplyDeBruijnBitPosition2[(uint32_t)(v * 0x07C4ACDDU) >> 27];
+  return MultiplyDeBruijnBitPosition2[(uint32_t) (v * 0x07C4ACDDU) >> 27];
 }
 
 std::vector<QRect> findRectAreas(const BinaryImage& mask, BWColor contentColor, int sensitivity) {
@@ -2317,6 +2332,26 @@ BinaryImage OutputGenerator::Processor::binarize(const QImage& image) const {
       const double thresholdCoef = blackWhiteOptions.getWolfCoef();
 
       binarized = binarizeWolf(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
+      break;
+    }
+    case T_FOX: {
+      const double thresholdDelta = blackWhiteOptions.thresholdAdjustment();
+      const QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
+      const auto lowerBound = (unsigned char) blackWhiteOptions.getWolfLowerBound();
+      const auto upperBound = (unsigned char) blackWhiteOptions.getWolfUpperBound();
+      const double thresholdCoef = blackWhiteOptions.getWolfCoef();
+
+      binarized = binarizeFox(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
+      break;
+    }
+    case T_WINDOW: {
+      const double thresholdDelta = blackWhiteOptions.thresholdAdjustment();
+      const QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
+      const auto lowerBound = (unsigned char) blackWhiteOptions.getWolfLowerBound();
+      const auto upperBound = (unsigned char) blackWhiteOptions.getWolfUpperBound();
+      const double thresholdCoef = blackWhiteOptions.getWolfCoef();
+
+      binarized = binarizeWindow(image, windowsSize, lowerBound, upperBound, thresholdCoef, thresholdDelta);
       break;
     }
     case T_BRADLEY: {

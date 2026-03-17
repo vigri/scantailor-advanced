@@ -58,4 +58,6 @@ add_library(imageproc STATIC ${sources})
 target_link_libraries(imageproc PUBLIC foundation math)
 target_include_directories(imageproc PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_subdirectory(tests)
+if (BUILD_TESTS)
+  add_subdirectory(tests)
+endif()

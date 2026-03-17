@@ -128,6 +128,13 @@ class ImageViewBase : public QAbstractScrollArea {
   QRectF getOccupiedWidgetRect() const;
 
   /**
+   * Sample the image at the given widget rectangle (e.g. for color pickup).
+   * Uses the underlying image instead of widget grab, so it works with OpenGL (issue #89).
+   * Returns a small image region around the widget rect center in image space, or null if out of bounds.
+   */
+  QImage sampleImageAtWidgetRect(const QRect& widgetRect, int maxImageSide = 31) const;
+
+  /**
    * \brief A better version of setStatusTip().
    *
    * Unlike setStatusTip(), this method will display the tooltip

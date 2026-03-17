@@ -10,18 +10,18 @@
 #include <list>
 #include <memory>
 
-#include "BinarizationOptionsWidget.h"
 #include "ColorParams.h"
+#include "OptionsWidgetBinarization.h"
 #include "Settings.h"
-#include "ui_OtsuBinarizationOptionsWidget.h"
+#include "ui_OptionsWidgetBinarizationOtsu.h"
 
 namespace output {
-class OtsuBinarizationOptionsWidget : public BinarizationOptionsWidget, private Ui::OtsuBinarizationOptionsWidget {
+class OptionsWidgetBinarizationOtsu : public OptionsWidgetBinarization, private Ui::OptionsWidgetBinarizationOtsu {
   Q_OBJECT
  public:
-  explicit OtsuBinarizationOptionsWidget(std::shared_ptr<Settings> settings);
+  explicit OptionsWidgetBinarizationOtsu(std::shared_ptr<Settings> settings);
 
-  ~OtsuBinarizationOptionsWidget() override = default;
+  ~OptionsWidgetBinarizationOtsu() override = default;
 
   void updateUi(const PageId& m_pageId) override;
 
