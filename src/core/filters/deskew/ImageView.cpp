@@ -18,6 +18,7 @@
 namespace deskew {
 const double ImageView::m_maxRotationDeg = 45.0;
 const double ImageView::m_maxRotationSin = std::sin(m_maxRotationDeg * constants::DEG2RAD);
+const double ImageView::m_maxObliqueDeg = 5.0;
 const int ImageView::m_cellSize = 20;
 
 ImageView::ImageView(const QImage& image, const QImage& downscaledImage, const ImageTransformation& xform)
@@ -30,15 +31,16 @@ ImageView::ImageView(const QImage& image, const QImage& downscaledImage, const I
 
   interactionState().setDefaultStatusTip(tr("Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation."));
 
-  const QString tip(tr("Drag this handle to rotate the image."));
+  const QString rotationTip(tr("Drag this handle to rotate the image."));
+  const QString obliqueTip(tr("Drag this handle to adjust oblique (shear)."));
   const double hitRadius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
-  for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < 4; ++i) {
     m_handles[i].setHitRadius(hitRadius);
     m_handles[i].setPositionCallback(boost::bind(&ImageView::handlePosition, this, i));
     m_handles[i].setMoveRequestCallback(boost::bind(&ImageView::handleMoveRequest, this, i, boost::placeholders::_1));
     m_handles[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
 
-    m_handleInteractors[i].setProximityStatusTip(tip);
+    m_handleInteractors[i].setProximityStatusTip(i < 2 ? rotationTip : obliqueTip);
     m_handleInteractors[i].setObject(&m_handles[i]);
 
     makeLastFollower(m_handleInteractors[i]);
@@ -82,6 +84,15 @@ void ImageView::manualDeskewAngleSetExternally(const double degrees) {
   }
 
   m_xform.setPostRotation(degrees);
+  updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
+}
+
+void ImageView::manualObliqueAngleSetExternally(const double degrees) {
+  if (m_xform.postOblique() == degrees) {
+    return;
+  }
+
+  m_xform.setPostOblique(degrees);
   updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
 }
 
@@ -137,6 +148,17 @@ void ImageView::onPaint(QPainter& painter, const InteractionState& interaction) 
   painter.drawPixmap(rect.topLeft(), m_handlePixmap);
   rect.moveCenter(handles.second);
   painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+
+  // Vertical arc and handles for oblique (shear).
+  const QRectF obliqueArcSquare(getObliqueArcSquare());
+  painter.drawArc(obliqueArcSquare, qRound(16 * (90 - m_maxObliqueDeg)), qRound(16 * 2 * m_maxObliqueDeg));
+  painter.drawArc(obliqueArcSquare, qRound(16 * (270 - m_maxObliqueDeg)), qRound(16 * 2 * m_maxObliqueDeg));
+
+  const std::pair<QPointF, QPointF> obliqueHandles(getObliqueHandles(obliqueArcSquare));
+  rect.moveCenter(obliqueHandles.first);
+  painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+  rect.moveCenter(obliqueHandles.second);
+  painter.drawPixmap(rect.topLeft(), m_handlePixmap);
 }  // ImageView::onPaint
 
 void ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction) {
@@ -168,37 +190,60 @@ void ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction) 
 }  // ImageView::onWheelEvent
 
 QPointF ImageView::handlePosition(int idx) const {
-  const std::pair<QPointF, QPointF> handles(getRotationHandles(getRotationArcSquare()));
-  if (idx == 0) {
-    return handles.first;
+  if (idx < 2) {
+    const std::pair<QPointF, QPointF> handles(getRotationHandles(getRotationArcSquare()));
+    return idx == 0 ? handles.first : handles.second;
   } else {
-    return handles.second;
+    const std::pair<QPointF, QPointF> handles(getObliqueHandles(getObliqueArcSquare()));
+    return idx == 2 ? handles.first : handles.second;
   }
 }
 
 void ImageView::handleMoveRequest(int idx, const QPointF& pos) {
-  const QRectF arcSquare(getRotationArcSquare());
-  const double arcRadius = 0.5 * arcSquare.width();
-  const double absY = pos.y();
-  double relY = absY - arcSquare.center().y();
-  relY = qBound(-arcRadius, relY, arcRadius);
+  if (idx < 2) {
+    const QRectF arcSquare(getRotationArcSquare());
+    const double arcRadius = 0.5 * arcSquare.width();
+    const double absY = pos.y();
+    double relY = absY - arcSquare.center().y();
+    relY = qBound(-arcRadius, relY, arcRadius);
 
-  double angleRad = std::asin(relY / arcRadius);
-  if (idx == 0) {
-    angleRad = -angleRad;
-  }
-  double angleDeg = angleRad * constants::RAD2DEG;
-  angleDeg = qBound(-m_maxRotationDeg, angleDeg, m_maxRotationDeg);
-  if (angleDeg == m_xform.postRotation()) {
-    return;
-  }
+    double angleRad = std::asin(relY / arcRadius);
+    if (idx == 0) {
+      angleRad = -angleRad;
+    }
+    double angleDeg = angleRad * constants::RAD2DEG;
+    angleDeg = qBound(-m_maxRotationDeg, angleDeg, m_maxRotationDeg);
+    if (angleDeg == m_xform.postRotation()) {
+      return;
+    }
 
-  m_xform.setPostRotation(angleDeg);
-  updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
+    m_xform.setPostRotation(angleDeg);
+    updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
+  } else {
+    const QRectF arcSquare(getObliqueArcSquare());
+    const double arcRadius = 0.5 * arcSquare.height();
+    const double absX = pos.x();
+    double relX = absX - arcSquare.center().x();
+    relX = qBound(-arcRadius, relX, arcRadius);
+
+    double angleRad = std::asin(relX / arcRadius);
+    if (idx == 3) {
+      angleRad = -angleRad;  // bottom handle: right drag => negative oblique
+    }
+    double angleDeg = angleRad * constants::RAD2DEG;
+    angleDeg = qBound(-m_maxObliqueDeg, angleDeg, m_maxObliqueDeg);
+    if (angleDeg == m_xform.postOblique()) {
+      return;
+    }
+
+    m_xform.setPostOblique(angleDeg);
+    updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
+  }
 }
 
 void ImageView::dragFinished() {
   emit manualDeskewAngleSet(m_xform.postRotation());
+  emit manualObliqueAngleSet(m_xform.postOblique());
 }
 
 /**
@@ -243,5 +288,38 @@ std::pair<QPointF, QPointF> ImageView::getRotationHandles(const QRectF& arcSquar
   QPointF rightHandle(rotCos * arcRadius, rotSin * arcRadius);
   rightHandle += arcCenter;
   return std::make_pair(leftHandle, rightHandle);
+}
+
+QRectF ImageView::getObliqueArcSquare() const {
+  const double hMargin
+      = 0.5 * m_handlePixmap.width()
+        + verticalScrollBar()->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, verticalScrollBar());
+  const double vMargin
+      = 0.5 * m_handlePixmap.height()
+        + horizontalScrollBar()->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, horizontalScrollBar());
+
+  QRectF reducedScreenRect(maxViewportRect());
+  reducedScreenRect.adjust(hMargin, vMargin, -hMargin, -vMargin);
+
+  const double obliqueSin = std::sin(m_maxObliqueDeg * constants::DEG2RAD);
+  QSizeF arcSize(obliqueSin, 1.0);
+  arcSize.scale(reducedScreenRect.size(), Qt::KeepAspectRatio);
+  arcSize.setWidth(arcSize.height());
+
+  QRectF arcSquare(QPointF(0, 0), arcSize);
+  arcSquare.moveRight(reducedScreenRect.right());
+  arcSquare.moveCenter(QPointF(arcSquare.center().x(), reducedScreenRect.center().y()));
+  return arcSquare;
+}
+
+std::pair<QPointF, QPointF> ImageView::getObliqueHandles(const QRectF& arcSquare) const {
+  const double obliqueRad = m_xform.postOblique() * constants::DEG2RAD;
+  const double oblSin = std::sin(obliqueRad);
+  const double oblCos = std::cos(obliqueRad);
+  const double arcRadius = 0.5 * arcSquare.height();
+  const QPointF arcCenter(arcSquare.center());
+  QPointF topHandle(arcCenter.x() + oblSin * arcRadius, arcCenter.y() - oblCos * arcRadius);
+  QPointF bottomHandle(arcCenter.x() - oblSin * arcRadius, arcCenter.y() + oblCos * arcRadius);
+  return std::make_pair(topHandle, bottomHandle);
 }
 }  // namespace deskew

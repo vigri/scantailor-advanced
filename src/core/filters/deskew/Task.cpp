@@ -298,5 +298,9 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
 
   QObject::connect(view, SIGNAL(manualDeskewAngleSet(double)), optWidget, SLOT(manualDeskewAngleSetExternally(double)));
   QObject::connect(optWidget, SIGNAL(manualDeskewAngleSet(double)), view, SLOT(manualDeskewAngleSetExternally(double)));
+  QObject::connect(view, SIGNAL(manualObliqueAngleSet(double)), optWidget,
+                   SLOT(manualObliqueAngleSetExternally(double)));
+  QObject::connect(optWidget, SIGNAL(manualObliqueAngleSet(double)), view,
+                   SLOT(manualObliqueAngleSetExternally(double)));
 }
 }  // namespace deskew
