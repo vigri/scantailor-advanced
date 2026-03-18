@@ -58,7 +58,8 @@ std::optional<double> findObliqueDegrees(const BinaryImage& mask,
   const Skew s1 = skewFinder.findSkew(mask);
   const Skew s2 = skewFinder.findSkew(rotated);
 
-  if (s1.confidence() < Skew::GOOD_CONFIDENCE || s2.confidence() < Skew::GOOD_CONFIDENCE) {
+  // Only require confidence on the main skew (s1); s2 on the rotated sausage mask may be noisier (review #110).
+  if (s1.confidence() < Skew::GOOD_CONFIDENCE) {
     return std::nullopt;
   }
 
