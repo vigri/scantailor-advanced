@@ -163,8 +163,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
         const QRect dstRect = dstCorners.boundingRect().toAlignedRect();
         if (dstRect.isValid()) {
           const QImage srcQ = rotatedImage.toQImage();
-          const QImage dstQ = transform(srcQ, rotXform, dstRect,
-                                        OutsidePixels::assumeWeakColor(Qt::white));
+          const QImage dstQ = transform(srcQ, rotXform, dstRect, OutsidePixels::assumeWeakColor(Qt::white));
           horizontalMask = BinaryImage(dstQ);
         } else {
           horizontalMask = rotatedImage;

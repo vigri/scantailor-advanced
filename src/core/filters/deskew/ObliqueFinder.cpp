@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include <BinaryImage.h>
 #include <BWColor.h>
+#include <BinaryImage.h>
 #include <SkewFinder.h>
 #include <imageproc/OrthogonalRotation.h>
 
@@ -45,9 +45,7 @@ BinaryImage buildSausageMask(const BinaryImage& image) {
   return result;
 }
 
-std::optional<double> findObliqueDegrees(const BinaryImage& mask,
-                                         SkewFinder& skewFinder,
-                                         double maxObliqueDeg) {
+std::optional<double> findObliqueDegrees(const BinaryImage& mask, SkewFinder& skewFinder, double maxObliqueDeg) {
   if (mask.isNull()) {
     return std::nullopt;
   }
