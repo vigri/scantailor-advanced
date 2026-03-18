@@ -398,7 +398,7 @@ BinaryImage binarizeWindow(const QImage& src,
   const uint64_t meanFull = integralImage.sum(QRect(0, 0, w, h)) / areaFull;
   double deviationMax = 0.0;
   double deviationMin = 256.0;
-  const double coefw = k * 3.0;  // translate from Wolf to Window coef.
+  const double coefw = k * 3.0; // translate from Wolf to Window coef.
 
   grayLine = gray.bits();
   for (int y = 0; y < h; ++y) {
