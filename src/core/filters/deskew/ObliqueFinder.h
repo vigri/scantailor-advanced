@@ -28,9 +28,10 @@ imageproc::BinaryImage buildSausageMask(const imageproc::BinaryImage& image);
 /**
  * \brief Estimate oblique angle in degrees using sausage-mask and skew difference.
  *
+ * For best results the mask should be from a deskewed (horizontal) image (see PR #110).
  * Builds sausage mask, rotates it 90°, runs SkewFinder on original and rotated.
  * Oblique = skew(original) - skew(rotated), clamped to ±maxObliqueDeg.
- * Returns std::nullopt if either skew has low confidence or result is invalid.
+ * Returns std::nullopt if skew has low confidence or result is invalid.
  */
 std::optional<double> findObliqueDegrees(const imageproc::BinaryImage& mask,
                                          imageproc::SkewFinder& skewFinder,

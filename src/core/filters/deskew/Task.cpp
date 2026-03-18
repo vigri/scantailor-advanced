@@ -17,7 +17,10 @@
 #include <imageproc/Grayscale.h>
 #include <imageproc/OrthogonalRotation.h>
 #include <imageproc/PolygonRasterizer.h>
+#include <imageproc/Transform.h>
 
+#include <QPolygonF>
+#include <QTransform>
 #include <utility>
 
 #include "DebugImagesImpl.h"
@@ -140,7 +143,34 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
       }
       uiData.setMode(MODE_AUTO);
 
-      const std::optional<double> obliqueDeg = findObliqueDegrees(rotatedImage, skewFinder, 5.0);
+      // Find oblique on the deskewed (horizontal) mask for better accuracy (PR #110 feedback).
+      BinaryImage horizontalMask;
+      const double deskewAngleDeg = uiData.effectiveDeskewAngle();
+      if (std::abs(deskewAngleDeg) < 1e-6) {
+        horizontalMask = rotatedImage;
+      } else {
+        const int w = rotatedImage.width();
+        const int h = rotatedImage.height();
+        QTransform rotXform;
+        const QPointF center(0.5 * w, 0.5 * h);
+        rotXform.translate(-center.x(), -center.y());
+        rotXform.rotate(deskewAngleDeg);
+        rotXform.translate(center.x(), center.y());
+        const QRectF srcRectF(0, 0, w, h);
+        QPolygonF dstCorners;
+        dstCorners << rotXform.map(srcRectF.topLeft()) << rotXform.map(srcRectF.topRight())
+                   << rotXform.map(srcRectF.bottomRight()) << rotXform.map(srcRectF.bottomLeft());
+        const QRect dstRect = dstCorners.boundingRect().toAlignedRect();
+        if (dstRect.isValid()) {
+          const QImage srcQ = rotatedImage.toQImage();
+          const QImage dstQ = transform(srcQ, rotXform, dstRect,
+                                        OutsidePixels::assumeWeakColor(Qt::white));
+          horizontalMask = BinaryImage(dstQ);
+        } else {
+          horizontalMask = rotatedImage;
+        }
+      }
+      const std::optional<double> obliqueDeg = findObliqueDegrees(horizontalMask, skewFinder, 5.0);
       if (obliqueDeg) {
         uiData.setEffectiveObliqueAngle(-*obliqueDeg);
       }
