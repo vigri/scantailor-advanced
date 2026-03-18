@@ -58,12 +58,10 @@ std::optional<double> findObliqueDegrees(const BinaryImage& mask,
   const Skew s1 = skewFinder.findSkew(mask);
   const Skew s2 = skewFinder.findSkew(rotated);
 
-  // Only require confidence on the main skew (s1); s2 on the rotated sausage mask may be noisier (review #110).
-  if (s1.confidence() < Skew::GOOD_CONFIDENCE) {
-    return std::nullopt;
-  }
-
-  double oblique = s1.angle() - s2.angle();
+  // Weight angles by confidence so low-confidence skew contributes less (PR #110, zvezdochiot).
+  const double angleHor = s1.angle() * s1.confidence() / (s1.confidence() + 1.0);
+  const double angleVert = s2.angle() * s2.confidence() / (s2.confidence() + 1.0);
+  double oblique = angleVert - angleHor;
   oblique = std::max(-maxObliqueDeg, std::min(maxObliqueDeg, oblique));
   return oblique;
 }
