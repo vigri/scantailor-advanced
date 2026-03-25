@@ -33,9 +33,13 @@ class ImageView : public ImageViewBase, private InteractionHandler {
 
   void manualDeskewAngleSet(double degrees);
 
+  void manualObliqueAngleSet(double degrees);
+
  public slots:
 
   void manualDeskewAngleSetExternally(double degrees);
+
+  void manualObliqueAngleSetExternally(double degrees);
 
   void doRotateLeft();
 
@@ -61,13 +65,18 @@ class ImageView : public ImageViewBase, private InteractionHandler {
 
   std::pair<QPointF, QPointF> getRotationHandles(const QRectF& arcSquare) const;
 
+  QRectF getObliqueArcSquare() const;
+
+  std::pair<QPointF, QPointF> getObliqueHandles(const QRectF& arcSquare) const;
+
   static const int m_cellSize;
   static const double m_maxRotationDeg;
   static const double m_maxRotationSin;
+  static const double m_maxObliqueDeg;
 
   QPixmap m_handlePixmap;
-  DraggablePoint m_handles[2];
-  ObjectDragHandler m_handleInteractors[2];
+  DraggablePoint m_handles[4];  // 0,1: rotation; 2,3: oblique
+  ObjectDragHandler m_handleInteractors[4];
   DragHandler m_dragHandler;
   ZoomHandler m_zoomHandler;
   ImageTransformation m_xform;

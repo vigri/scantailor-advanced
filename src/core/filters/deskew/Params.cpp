@@ -1,5 +1,6 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
+// Split Params: Zvezdochiot; dev branch implements as requested (see Params.h).
 
 #include "Params.h"
 
@@ -11,27 +12,27 @@ using namespace foundation;
 
 namespace deskew {
 Params::Params(const double deskewAngleDeg, const Dependencies& deps, const AutoManualMode mode)
-    : m_deskewAngleDeg(deskewAngleDeg), m_obliqueDeg(0.0), m_deps(deps), m_mode(mode) {}
+    : m_rotation{deskewAngleDeg, mode}, m_oblique{0.0}, m_deps(deps) {}
 
 Params::Params(const double deskewAngleDeg,
                const double obliqueDeg,
                const Dependencies& deps,
                const AutoManualMode mode)
-    : m_deskewAngleDeg(deskewAngleDeg), m_obliqueDeg(obliqueDeg), m_deps(deps), m_mode(mode) {}
+    : m_rotation{deskewAngleDeg, mode}, m_oblique{obliqueDeg}, m_deps(deps) {}
 
 Params::Params(const QDomElement& deskewEl)
-    : m_deskewAngleDeg(deskewEl.attribute("angle").toDouble()),
-      m_obliqueDeg(deskewEl.attribute("oblique").toDouble()),
-      m_deps(deskewEl.namedItem("dependencies").toElement()),
-      m_mode(deskewEl.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO) {}
+    : m_rotation{deskewEl.attribute("angle").toDouble(),
+                 deskewEl.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO},
+      m_oblique{deskewEl.attribute("oblique").toDouble()},
+      m_deps(deskewEl.namedItem("dependencies").toElement()) {}
 
 Params::~Params() = default;
 
 QDomElement Params::toXml(QDomDocument& doc, const QString& name) const {
   QDomElement el(doc.createElement(name));
-  el.setAttribute("mode", m_mode == MODE_AUTO ? "auto" : "manual");
-  el.setAttribute("angle", Utils::doubleToString(m_deskewAngleDeg));
-  el.setAttribute("oblique", Utils::doubleToString(m_obliqueDeg));
+  el.setAttribute("mode", m_rotation.mode == MODE_AUTO ? "auto" : "manual");
+  el.setAttribute("angle", Utils::doubleToString(m_rotation.angle));
+  el.setAttribute("oblique", Utils::doubleToString(m_oblique.obliqueAngle));
   el.appendChild(m_deps.toXml(doc, "dependencies"));
   return el;
 }

@@ -62,9 +62,13 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
 
   void manualDeskewAngleSet(double degrees);
 
+  void manualObliqueAngleSet(double degrees);
+
  public slots:
 
   void manualDeskewAngleSetExternally(double degrees);
+
+  void manualObliqueAngleSetExternally(double degrees);
 
  public:
   void preUpdateUI(const PageId& pageId);

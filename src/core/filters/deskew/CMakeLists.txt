@@ -13,6 +13,7 @@ set(sources
     Task.cpp Task.h
     CacheDrivenTask.cpp CacheDrivenTask.h
     Dependencies.cpp Dependencies.h
+    ObliqueFinder.cpp ObliqueFinder.h
     Params.cpp Params.h
     ApplyDialog.cpp ApplyDialog.h
     Utils.cpp Utils.h)

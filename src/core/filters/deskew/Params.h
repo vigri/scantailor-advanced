@@ -1,5 +1,8 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
+//
+// Split Params (Issue #1): refactor into RotationParams and ObliqueParams as requested by Zvezdochiot;
+// in the dev branch this is implemented (single <params> XML preserved for compatibility).
 
 #ifndef SCANTAILOR_DESKEW_PARAMS_H_
 #define SCANTAILOR_DESKEW_PARAMS_H_
@@ -15,6 +18,18 @@ class QDomDocument;
 class QDomElement;
 
 namespace deskew {
+
+/** Rotation (deskew) angle and auto/manual mode. */
+struct RotationParams {
+  double angle = 0.0;
+  AutoManualMode mode = MODE_AUTO;
+};
+
+/** Oblique (shear) angle in degrees. */
+struct ObliqueParams {
+  double obliqueAngle = 0.0;
+};
+
 class Params {
  public:
   // Member-wise copying is OK.
@@ -38,19 +53,18 @@ class Params {
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
  private:
-  double m_deskewAngleDeg;
-  double m_obliqueDeg;
+  RotationParams m_rotation;
+  ObliqueParams m_oblique;
   Dependencies m_deps;
-  AutoManualMode m_mode;
 };
 
 
 inline double Params::deskewAngle() const {
-  return m_deskewAngleDeg;
+  return m_rotation.angle;
 }
 
 inline double Params::obliqueAngle() const {
-  return m_obliqueDeg;
+  return m_oblique.obliqueAngle;
 }
 
 inline const Dependencies& Params::dependencies() const {
@@ -58,7 +72,7 @@ inline const Dependencies& Params::dependencies() const {
 }
 
 inline AutoManualMode Params::mode() const {
-  return m_mode;
+  return m_rotation.mode;
 }
 }  // namespace deskew
 

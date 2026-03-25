@@ -76,6 +76,18 @@ void OptionsWidget::manualDeskewAngleSetExternally(const double degrees) {
   emit invalidateThumbnail(m_pageId);
 }
 
+void OptionsWidget::manualObliqueAngleSetExternally(const double degrees) {
+  auto block = m_connectionManager.getScopedBlock();
+
+  m_uiData.setEffectiveObliqueAngle(degrees);
+  m_uiData.setMode(MODE_MANUAL);
+  updateModeIndication(MODE_MANUAL);
+  obliqueSpinBox->setValue(degrees);
+  commitCurrentParams();
+
+  emit invalidateThumbnail(m_pageId);
+}
+
 void OptionsWidget::preUpdateUI(const PageId& pageId) {
   auto block = m_connectionManager.getScopedBlock();
 
@@ -192,6 +204,7 @@ void OptionsWidget::obliqueSpinBoxValueChanged(double value) {
     updateModeIndication(MODE_MANUAL);
   }
   commitCurrentParams();
+  emit manualObliqueAngleSet(value);
   emit invalidateThumbnail(m_pageId);
 }
 
