@@ -7,7 +7,7 @@ bin/
 lib/
 *.dir/
 
-# CMake (generated); keep tracked project modules under cmake/
+# CMake (generated). Tracked helper modules live under cmake/.
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
@@ -22,7 +22,7 @@ install_manifest.txt
 compile_commands.json
 CMakeUserPresets.json
 
-# C/C++ compilado
+# C/C++ build artifacts
 *.o
 *.obj
 *.a
@@ -62,7 +62,7 @@ ui_*.h
 *.includes
 *.config
 
-# IDEs y editores
+# Editors / IDEs
 .cursor/
 .vscode/
 .idea/
@@ -76,12 +76,12 @@ ui_*.h
 .cache/clangd/
 *.code-workspace
 
-# Visual Studio (CMake “Open folder”)
+# Visual Studio (CMake "Open Folder")
 .vs/
 CMakeSettings.json
 CppProperties.json
 
-# Sistema operativo
+# Operating system junk
 .DS_Store
 .DS_Store?
 ._*
@@ -90,7 +90,7 @@ ehthumbs.db
 Desktop.ini
 .directory
 
-# Depuradores y profiling
+# Debuggers / profiling
 *.core
 /core
 *.stackdump
@@ -103,7 +103,7 @@ Desktop.ini
 perf.data
 perf.data.old
 
-# Tags / navegación C
+# Ctags / cscope
 tags
 TAGS
 GTAGS
@@ -111,29 +111,19 @@ GRTAGS
 GPATH
 cscope.out
 
-# Documentación generada
+# Generated docs
 doc/html/
 doc/latex/
 docs/_build/
 *.dox
 
-# Tests y cobertura
+# Tests / coverage output
 Testing/
 test_results/
 coverage/
 lcov.info
 
-# Python (scripts/, herramientas locales)
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-venv/
-.venv/
-
-# Empaquetado y distribución
+# Packaging / distribution artifacts
 *.tar
 *.tar.gz
 *.zip
@@ -145,23 +135,23 @@ venv/
 *.flatpak
 packaging/build/
 
-# Flatpak / flatpak-builder (builds locales y CI)
+# flatpak-builder output (local smoke builds / CI)
 .flatpak-builder/
 flatpak/.flatpak-builder/
 repo/
 build-dir/
 
-# Parches y merge
+# Patch / merge leftovers
 *.orig
 *.rej
 
-# Variables de entorno / local
+# Local env / CMake overrides
 .env
 .env.local
 *.local
 local.cmake
 
-# Otros
+# Misc
 *.log
 *.tmp
 *.temp
