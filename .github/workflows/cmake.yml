@@ -19,9 +19,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
-    
+
     - name: Install dependencies
-      run: sudo apt install -y gcc g++ cmake libjpeg-dev libpng-dev libtiff6 libtiff5-dev libboost-test-dev qtbase5-dev libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev libpthread-stubs0-dev rpm libfuse2
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --fix-missing \
+          gcc g++ cmake \
+          libjpeg-dev libpng-dev \
+          libtiff6 libtiff5-dev \
+          libboost-test-dev \
+          qtbase5-dev libqt5svg5-dev \
+          qttools5-dev qttools5-dev-tools \
+          libqt5opengl5-dev \
+          libpthread-stubs0-dev \
+          rpm libfuse2t64
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
