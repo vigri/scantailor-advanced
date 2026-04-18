@@ -58,14 +58,38 @@ jobs:
     - name: Create AppImage package
       working-directory: ${{github.workspace}}/build
       run: |
+        echo "===== DEBUG START ====="
+        echo "PWD:"
+        pwd
+
+        echo "Workspace:"
+        echo "${{ github.workspace }}"
+
+        echo "---- List target directory ----"
+        ls -la "${{ github.workspace }}/src/resources/unix" || true
+
+        echo "---- Find any desktop files ----"
+        find "${{ github.workspace }}" -iname "*desktop*" || true
+
+        echo "---- Check exact file ----"
+        if [ -f "${{ github.workspace }}/src/resources/unix/scantailor.desktop" ]; then
+          echo "FOUND: scantailor.desktop"
+        else
+          echo "MISSING: scantailor.desktop"
+        fi
+
+        echo "===== DEBUG END ====="
+
         wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
         chmod +x linuxdeploy-x86_64.AppImage
+
         ./linuxdeploy-x86_64.AppImage \
           --appdir AppDir \
-          --desktop-file ${{github.workspace}}/src/resources/unix/scantailor.desktop \
-          --icon-file ${{github.workspace}}/src/resources/ScanTailor.png \
+          --desktop-file "${{github.workspace}}/src/resources/unix/scantailor.desktop" \
+          --icon-file "${{github.workspace}}/src/resources/ScanTailor.png" \
           --executable scantailor \
           --output appimage
+
         mv ScanTailor*.AppImage scantailor.AppImage
       
     - name: Upload Linux bin
