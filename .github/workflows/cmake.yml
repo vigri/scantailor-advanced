@@ -72,7 +72,8 @@ jobs:
         find "${{ github.workspace }}" -iname "*desktop*" || true
 
         echo "---- Check exact file ----"
-        if [ -f "${{ github.workspace }}/src/resources/unix/scantailor.desktop" ]; then
+        /home/runner/work/scantailor-advanced/scantailor-advanced
+        if [ -f "${{ github.workspace }}/build/scantailor.desktop" ]; then
           echo "FOUND: scantailor.desktop"
         else
           echo "MISSING: scantailor.desktop"
@@ -85,8 +86,8 @@ jobs:
 
         ./linuxdeploy-x86_64.AppImage \
           --appdir AppDir \
-          --desktop-file "${{github.workspace}}/src/resources/unix/scantailor.desktop" \
-          --icon-file "${{github.workspace}}/src/resources/ScanTailor.png" \
+          --desktop-file "${{ github.workspace }}/build/scantailor.desktop" \
+          --icon-file "${{ github.workspace }}/src/resources/ScanTailor.png" \
           --executable scantailor \
           --output appimage
 
