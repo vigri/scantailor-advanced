@@ -72,7 +72,6 @@ jobs:
         find "${{ github.workspace }}" -iname "*desktop*" || true
 
         echo "---- Check exact file ----"
-        /home/runner/work/scantailor-advanced/scantailor-advanced
         if [ -f "${{ github.workspace }}/build/scantailor.desktop" ]; then
           echo "FOUND: scantailor.desktop"
         else
