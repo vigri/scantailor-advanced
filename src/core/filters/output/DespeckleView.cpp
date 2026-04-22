@@ -94,8 +94,9 @@ DespeckleView::DespeckleView(const DespeckleState& despeckleState,
   if (!visualization.isNull()) {
     // Create the image view.
     auto widget = std::make_unique<BasicImageView>(visualization.image(), visualization.downscaledImage());
+    auto* rawWidget = widget.get();
     setCurrentIndex(addWidget(widget.release()));
-    emit imageViewCreated(dynamic_cast<ImageViewBase*>(widget.get()));
+    emit imageViewCreated(dynamic_cast<ImageViewBase*>(rawWidget));
   }
 }
 
@@ -176,8 +177,9 @@ void DespeckleView::despeckleDone(const DespeckleState& despeckleState,
     widget = std::move(tabWidget);
   }
 
+  auto* rawWidget = widget.get();
   setCurrentIndex(addWidget(widget.release()));
-  emit imageViewCreated(dynamic_cast<ImageViewBase*>(widget.get()));
+  emit imageViewCreated(dynamic_cast<ImageViewBase*>(rawWidget));
 }
 
 void DespeckleView::cancelBackgroundTask() {
