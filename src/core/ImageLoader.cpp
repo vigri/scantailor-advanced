@@ -43,6 +43,7 @@ QImage ImageLoader::load(QIODevice& ioDev, const int pageNum) {
       reader.setFormat("jpeg");
     }
   }
+  reader.setAllocationLimit(0);
   reader.read(&image);
   return image;
 }
