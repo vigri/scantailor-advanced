@@ -290,6 +290,8 @@ void OptionsWidget::onUnitsChanged(Units units) {
 #define CONNECT(...) m_connectionManager.addConnection(connect(__VA_ARGS__))
 
 void OptionsWidget::setupUiConnections() {
+  widthSpinBox->setKeyboardTracking(false);
+  heightSpinBox->setKeyboardTracking(false);
   CONNECT(widthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
   CONNECT(heightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
   CONNECT(contentDetectAutoBtn, &QPushButton::pressed, this,
